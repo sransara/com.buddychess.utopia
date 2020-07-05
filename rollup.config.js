@@ -2,7 +2,11 @@ import svelte from "rollup-plugin-svelte";
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import livereload from "rollup-plugin-livereload";
+import alias from "@rollup/plugin-alias";
 import { terser } from "rollup-plugin-terser";
+import postcss from "rollup-plugin-postcss";
+import { globalStyle } from "svelte-preprocess";
+import { mdsvex } from "mdsvex";
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -15,14 +19,21 @@ export default {
     file: "public/build/bundle.js",
   },
   plugins: [
+    alias({
+      resolve: [".jsx", ".js", ".svelte"],
+      entries: [{ find: "~src", replacement: `${__dirname}/src` }],
+    }),
+
     svelte({
       // enable run-time checks when not in production
       dev: !production,
-      // we'll extract any component CSS out into
-      // a separate file - better for performance
-      css: (css) => {
-        css.write("public/build/bundle.css");
-      },
+      emitCss: true,
+      preprocess: [globalStyle(), mdsvex()],
+    }),
+
+    postcss({
+      extract: "bundle.css",
+      sourceMap: !production,
     }),
 
     // If you have external dependencies installed from
@@ -34,6 +45,7 @@ export default {
       browser: true,
       dedupe: ["svelte"],
     }),
+
     commonjs(),
 
     // In dev mode, call `npm run start` once
