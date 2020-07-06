@@ -1,0 +1,60 @@
+.cg-wrap coords {
+  /* handle hidden coords */
+  .coords-no & {
+    display: none;
+  }
+
+  /* handle inner coords */
+  position: absolute;
+  display: flex;
+  pointer-events: none;
+  font-size: 1.5vw;
+  user-select: none;
+  color: #fff;
+  text-shadow: none;
+  font-weight: normal;
+
+  &.ranks {
+    flex-flow: column-reverse;
+    top: 1px;
+    /* a negative value creates empty space on the right side in mobile browsers */
+    right: 0;
+    height: 100%;
+    width: 0.8em;
+    &.black {
+      flex-flow: column;
+    }
+  }
+
+  &.files {
+    bottom: 0px;
+    left: 0;
+    text-align: left;
+    flex-flow: row;
+    width: 100%;
+    height: 1.4em;
+    &.black {
+      flex-flow: row-reverse;
+    }
+    coord {
+      padding-left: 4px;
+    }
+  }
+
+  coord {
+    flex: 1 1 auto;
+  }
+}
+
+.cg-wrap.orientation-white .files coord:nth-child(2n + 1),
+.cg-wrap.orientation-white .ranks coord:nth-child(2n),
+.cg-wrap.orientation-black .files coord:nth-child(2n),
+.cg-wrap.orientation-black .ranks coord:nth-child(2n + 1) {
+  color: #f0d9b5;
+}
+.cg-wrap.orientation-white .files coord:nth-child(2n),
+.cg-wrap.orientation-white .ranks coord:nth-child(2n + 1),
+.cg-wrap.orientation-black .files coord:nth-child(2n + 1),
+.cg-wrap.orientation-black .ranks coord:nth-child(2n) {
+  color: #b58863;
+}

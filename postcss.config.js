@@ -3,20 +3,18 @@ const production = !process.env.ROLLUP_WATCH;
 module.exports = {
   plugins: [
     require("postcss-import"),
-    require("tailwindcss"),
+    require("postcss-url")([
+      { url: "inline", maxSize: 1, fallback: "copy", optimizeSvgEncode: true },
+      {
+        url: "copy",
+        assetsPath: "assets",
+        useHash: true,
+        hashOptions: { append: true },
+      },
+    ]),
     require("postcss-nested"),
+    require("tailwindcss"),
     require("autoprefixer"),
-    ...(production
-      ? [
-          require("@fullhuman/postcss-purgecss")({
-            content: ["./src/**/*.html", "./src/**/*.svelte"],
-
-            whitelistPatterns: [/svelte-/],
-
-            defaultExtractor: (content) => content.match(/[A-Za-z0-9-_:/]+/g) || [],
-          }),
-          require("cssnano"),
-        ]
-      : []),
+    ...(production ? [require("cssnano")] : []),
   ],
 };
