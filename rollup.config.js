@@ -5,13 +5,14 @@ import livereload from "rollup-plugin-livereload";
 import alias from "@rollup/plugin-alias";
 import { terser } from "rollup-plugin-terser";
 import postcss from "rollup-plugin-postcss";
-import { globalStyle } from "svelte-preprocess";
+import typescript from "@rollup/plugin-typescript";
+import * as svautopp from "svelte-preprocess";
 import { mdsvex } from "mdsvex";
 
 const production = !process.env.ROLLUP_WATCH;
 
 export default {
-  input: "src/main.js",
+  input: "src/main.ts",
   output: {
     sourcemap: true,
     format: "iife",
@@ -27,12 +28,18 @@ export default {
     svelte({
       // enable run-time checks when not in production
       dev: !production,
+      extensions: [".svelte"],
       emitCss: true,
-      preprocess: [globalStyle(), mdsvex()],
+      preprocess: [
+        svautopp.typescript({ transpileOnly: true, tsconfigFile: "./tsconfig.json" }),
+        svautopp.globalStyle(),
+        mdsvex(),
+      ],
     }),
 
     postcss({
       extract: "bundle.css",
+      to: "public/build/bundle.css",
       sourceMap: !production,
     }),
 
@@ -45,8 +52,8 @@ export default {
       browser: true,
       dedupe: ["svelte"],
     }),
-
     commonjs(),
+    typescript(),
 
     // In dev mode, call `npm run start` once
     // the bundle has been generated

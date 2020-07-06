@@ -1,4 +1,4 @@
-<script>
+<script lang="typescript">
   import { link } from "svelte-spa-router";
 </script>
 
