@@ -84,6 +84,10 @@ cg-board piece {
   &.dragging {
     cursor: move;
     z-index: 100;
+    width: 15%;
+    height: 15%;
+    top: -1.5%;
+    left: -1.5%;
   }
   &.anim {
     z-index: 3;
