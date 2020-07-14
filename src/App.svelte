@@ -1,6 +1,14 @@
 <script lang="typescript">
+  import Navbar from "./Navbar.svelte";
   import Router from "svelte-spa-router";
-  import routes from "./routes";
+  import { routes } from "./routes";
+
+  let openSidebar = false;
+
+  function closeSidebar() {
+    openSidebar = false;
+  }
 </script>
 
-<Router routes="{routes}" />
+<Navbar bind:openSidebar />
+<Router routes="{routes}" on:routeLoaded="{closeSidebar}" />
