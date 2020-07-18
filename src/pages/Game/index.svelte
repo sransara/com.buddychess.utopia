@@ -1,175 +1,170 @@
 <script lang="typescript">
   import { onMount } from "svelte";
 
-  import CrazyChessground from "../../components/CrazyChessground/index.svelte";
+  import BuddyChessground from "../../components/BuddyChessground.svelte";
 
   import { Api } from "chessground/api";
   import { Config } from "chessground/config";
-  import { Color } from "chessground/types";
+  import * as cgtypes from "chessground/types";
 
   import { Chess } from "chess.js";
+  import * as chtypes from "chess.js";
 
-  function toDests(chess: any): any {
-    const dests = new Map();
-    chess.SQUARES.forEach((s: any) => {
+  // begin:chess.js extensions
+  function fenNextTurn(fen: cgtypes.FEN): cgtypes.FEN {
+    // rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1
+    let fenParts = fen.split(" ");
+    const currentTurn = fenParts[1];
+    fenParts[1] = currentTurn === "w" ? "b" : "w"; // change turn
+    fenParts[3] = "-"; // enpassant
+    fenParts[5] = currentTurn === "b" ? parseInt(fenParts[5]) + 1 + "" : fenParts[5];
+    return fenParts.join(" ");
+  }
+
+  function moves(chess: chtypes.ChessInstance): cgtypes.Dests {
+    const dests = new Map<chtypes.Square, chtypes.Square[]>();
+    chess.SQUARES.forEach((s: chtypes.Square) => {
       const ms = chess.moves({ square: s, verbose: true });
       if (ms.length) {
         dests.set(
           s,
-          ms.map((m: any) => m.to)
+          ms.map((m) => m.to)
         );
       }
     });
-    return dests;
+    // @ts-ignore
+    return dests as cgtypes.Dests;
   }
 
-  function chessForceChangeTurn(chess: any) {
-    // trick chess.js to change turn
-    // rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1
-    let fenParts = chess.fen().split(" ");
-    fenParts[1] = fenParts[1] === "w" ? "b" : "w";
-    fenParts[3] = "-";
-    fenParts[4] = "0";
-    fenParts[5] = chess.turn() === "b" ? parseInt(fenParts[5]) + 1 + "" : fenParts[5];
-    chess.load(fenParts.join(" "));
+  function move(chess: chtypes.ChessInstance, src: cgtypes.Key, dest: cgtypes.Key): cgtypes.FEN {
+    chess.move({ from: src as chtypes.Square, to: dest as chtypes.Square, promotion: "q" });
+    return chess.fen();
   }
 
-  function loadChessgroundStateFromChess(cg: Api, chess: any) {
-    cg.set({
-      fen: chess.fen(),
-      check: chess.in_check(),
-      turnColor: chess.turn() === "w" ? "white" : "black",
-      movable: {
-        color: chess.turn() === "w" ? "white" : "black",
-        dests: toDests(chess),
+  function put(chess: chtypes.ChessInstance, piece: cgtypes.Piece, dest: cgtypes.Key): cgtypes.FEN {
+    chess.put(
+      {
+        type: piece.role.charAt(0) as chtypes.PieceType,
+        color: piece.color.charAt(0) as "w" | "b",
       },
+      dest as chtypes.Square
+    );
+    // trick chess.js to change turn after a piece drop
+    const newFen = fenNextTurn(chess.fen());
+    chess.load(newFen);
+    return newFen;
+  }
+
+  function puts(chess: chtypes.ChessInstance, piece: cgtypes.Piece) {
+    let squares = chess.SQUARES as chtypes.Square[];
+
+    // square is valid only if already unoccupied
+    squares = squares.filter((square) => chess.get(square) == null);
+
+    // if pawn, can't put in 1st or 8th rank
+    squares = squares.filter((dest) => piece.role == "pawn" && !["1", "8"].includes(dest.charAt(1)));
+
+    if (!chess.in_check()) return squares;
+
+    // if in check, put is valid only if it removes the check
+    const fen = chess.fen();
+    const temp = new Chess();
+    squares = squares.filter((dest) => {
+      temp.load(fen);
+      temp.put(
+        {
+          type: piece.role.charAt(0) as chtypes.PieceType,
+          color: piece.color.charAt(0) as "w" | "b",
+        },
+        dest
+      );
+      // valid put only if putting the piece removes the check
+      return !temp.in_check();
     });
+
+    return squares;
   }
+  // end:chess.js extensions
 
-  function isValidPieceDrop(role: any, dest: any, chess: any) {
-    if (role === "pawn" && (dest[1] === "1" || dest[1] === "8")) {
-      return false;
-    }
-    return true;
-  }
-
-  // @ts-ignore
-  export let myChessground: Api = undefined;
-  // @ts-ignore
-  export let buddyChessground: Api = undefined;
-
+  const myColor: cgtypes.Color = "white";
   const myChess = new Chess();
-  const myChessgroundConfig: Config = {
-    orientation: "black",
+
+  const initClockState = {
+    waiting: false,
+    minutes: 5,
+    seconds: 0,
+  };
+
+  const initSpareState = {
+    dropType: undefined,
+    dropPiece: undefined,
+    pawnCount: 0,
+    knightCount: 0,
+    bishopCount: 0,
+    rookCount: 0,
+    queenCount: 0,
+  };
+
+  // @ts-ignore
+  let aChessground: Api = undefined;
+  const aChessgroundConfig: Config = {
+    orientation: myColor,
+    turnColor: "white",
     movable: {
-      color: "white",
+      color: myColor,
       free: false,
-      dests: toDests(myChess),
+      dests: moves(myChess),
     },
     draggable: {
       enabled: true,
       showGhost: true,
     },
     premovable: {
-      enabled: false,
+      enabled: true,
     },
     predroppable: {
-      enabled: false,
+      enabled: true,
     },
   };
+  let aWhiteIcon = "elephant";
+  let aWhiteClock = { ...initClockState };
+  let aWhiteSpares = { ...initSpareState };
+  let aBlackIcon = "giraffe";
+  let aBlackClock = { ...initClockState };
+  let aBlackSpares = { ...initSpareState };
 
-  onMount(() => {
-    myChessground.set({
-      movable: {
-        events: {
-          after: (orig: any, dest: any) => {
-            myChess.move({ from: orig, to: dest, promotion: "q" });
-            loadChessgroundStateFromChess(myChessground, myChess);
-          },
-          afterNewPiece: (role: any, dest: any) => {
-            if (!isValidPieceDrop(role, dest, myChess)) {
-              loadChessgroundStateFromChess(myChessground, myChess);
-              return;
-            }
-            myChess.put({ type: role[0], color: myChess.turn() }, dest);
-            chessForceChangeTurn(myChess);
-            loadChessgroundStateFromChess(myChessground, myChess);
-          },
-        },
-      },
-    });
-  });
-
-  const buddyChessgroundConfig: Config = {
-    orientation: "white",
+  // @ts-ignore
+  let bChessground: Api = undefined;
+  const bChessgroundConfig: Config = {
+    orientation: myColor == "white" ? "black" : "white",
+    viewOnly: true,
   };
-
-  let gamediv: any;
-
-  function fitGameView() {
-    if (!gamediv) return;
-    let y = window.innerHeight - gamediv.offsetTop - 5;
-    const rect = gamediv.getBoundingClientRect();
-    let w = rect.right - rect.left;
-    let h = rect.bottom - rect.top;
-    let x = (y * w) / h;
-    gamediv.style.width = `${Math.min(x, window.innerWidth)}px`;
-  }
-
-  let clientWidth: number;
-  $: clientWidth && fitGameView(); // Chrome updates div render height multiple times
-  window.addEventListener("resize", fitGameView);
+  let bInteractiveColor = false;
+  let bWhiteIcon = "rabbit";
+  let bWhiteClock = { ...initClockState };
+  let bWhiteSpares = { ...initSpareState };
+  let bBlackIcon = "monkey";
+  let bBlackClock = { ...initClockState };
+  let bBlackSpares = { ...initSpareState };
 </script>
 
-<div class="select-none px-2 flex" bind:this="{gamediv}" bind:clientWidth>
-  <div class="w-1/2 pr-2 inline-block">
-    <CrazyChessground
-      isMyChessground="{true}"
-      bind:chessground="{myChessground}"
-      chessgroundConfig="{myChessgroundConfig}"
-      topColor="{myChessgroundConfig.orientation == 'white' ? 'black' : 'white'}"
-      topSparePawnCount="{1}"
-      topSpareKnightCount="{0}"
-      topSpareBishopCount="{0}"
-      topSpareRookCount="{1}"
-      topSpareQueenCount="{0}"
-      topAvatarIcon="elephant"
-      topClockMinutes="{5}"
-      topClockSeconds="{0}"
-      bottomColor="{myChessgroundConfig.orientation == 'white' ? 'white' : 'black'}"
-      bottomSparePawnCount="{1}"
-      bottomSpareKnightCount="{0}"
-      bottomSpareBishopCount="{0}"
-      bottomSpareRookCount="{0}"
-      bottomSpareQueenCount="{0}"
-      bottomAvatarIcon="giraffe"
-      bottomClockMinutes="{5}"
-      bottomClockSeconds="{0}"
-    />
-  </div>
-  <div class="w-1/2 pl-2 inline-block">
-    <CrazyChessground
-      isMyChessground="{false}"
-      bind:chessground="{buddyChessground}"
-      chessgroundConfig="{buddyChessgroundConfig}"
-      topColor="{buddyChessgroundConfig.orientation == 'white' ? 'black' : 'white'}"
-      topSparePawnCount="{0}"
-      topSpareKnightCount="{0}"
-      topSpareBishopCount="{0}"
-      topSpareRookCount="{0}"
-      topSpareQueenCount="{0}"
-      topAvatarIcon="elephant"
-      topClockMinutes="{5}"
-      topClockSeconds="{0}"
-      bottomColor="{buddyChessgroundConfig.orientation == 'white' ? 'white' : 'black'}"
-      bottomSparePawnCount="{0}"
-      bottomSpareKnightCount="{0}"
-      bottomSpareBishopCount="{0}"
-      bottomSpareRookCount="{0}"
-      bottomSpareQueenCount="{0}"
-      bottomAvatarIcon="giraffe"
-      bottomClockMinutes="{5}"
-      bottomClockSeconds="{0}"
-    />
-  </div>
-</div>
+<BuddyChessground
+  bind:aChessground
+  {aChessgroundConfig}
+  aInteractiveColor="{myColor}"
+  {aWhiteIcon}
+  {aWhiteClock}
+  {aWhiteSpares}
+  {aBlackIcon}
+  {aBlackClock}
+  {aBlackSpares}
+  bind:bChessground
+  {bChessgroundConfig}
+  {bInteractiveColor}
+  {bWhiteIcon}
+  {bWhiteClock}
+  {bWhiteSpares}
+  {bBlackIcon}
+  {bBlackClock}
+  {bBlackSpares}
+/>

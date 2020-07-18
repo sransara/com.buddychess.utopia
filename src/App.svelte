@@ -11,4 +11,4 @@
 </script>
 
 <Navbar bind:openSidebar />
-<Router routes="{routes}" on:routeLoaded="{closeSidebar}" />
+<Router {routes} on:routeLoaded="{closeSidebar}" />

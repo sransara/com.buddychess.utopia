@@ -9,8 +9,15 @@ module.exports = {
     },
   },
   theme: {
-    extend: {},
+    extend: {
+      padding: {
+        "1/8": "12.5%",
+      },
+      width: {
+        "1/8": "12.5%",
+      },
+    },
   },
   variants: {},
-  plugins: [],
+  plugins: [require("@tailwindcss/typography")],
 };

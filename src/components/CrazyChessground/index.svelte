@@ -6,58 +6,92 @@
   import { Api } from "chessground/api";
   import * as cgtypes from "chessground/types";
 
-  export let isMyChessground: boolean;
   // @ts-ignore
   export let chessground: Api = undefined;
   export let chessgroundConfig: Config;
 
-  export let topColor: cgtypes.Color;
-  export let topAvatarIcon: string;
-  export let topClockMinutes: number;
-  export let topClockSeconds: number;
-  export let topSparePawnCount: number;
-  export let topSpareKnightCount: number;
-  export let topSpareBishopCount: number;
-  export let topSpareRookCount: number;
-  export let topSpareQueenCount: number;
+  let topColor: cgtypes.Color;
+  $: topColor = chessgroundConfig.orientation === "white" ? "black" : "white";
+  let bottomColor: cgtypes.Color;
+  $: bottomColor = chessgroundConfig.orientation === "white" ? "white" : "black";
 
-  export let bottomColor: cgtypes.Color;
-  export let bottomAvatarIcon: string;
-  export let bottomClockMinutes: number;
-  export let bottomClockSeconds: number;
-  export let bottomSparePawnCount: number;
-  export let bottomSpareKnightCount: number;
-  export let bottomSpareBishopCount: number;
-  export let bottomSpareRookCount: number;
-  export let bottomSpareQueenCount: number;
+  export let interactiveColor: cgtypes.Color | false;
+
+  export let whiteIcon: string;
+  export let blackIcon: string;
+
+  export let whiteClock: {
+    waiting: boolean;
+    minutes: number;
+    seconds: number;
+  };
+
+  export let blackClock: {
+    waiting: boolean;
+    minutes: number;
+    seconds: number;
+  };
+
+  export let whiteSpares: {
+    pawnCount: number;
+    knightCount: number;
+    bishopCount: number;
+    rookCount: number;
+    queenCount: number;
+  };
+
+  export let blackSpares: {
+    pawnCount: number;
+    knightCount: number;
+    bishopCount: number;
+    rookCount: number;
+    queenCount: number;
+  };
+
+  function spareDragNewPiece(e: Event) {
+    const data = (e as CustomEvent).detail;
+    if (data.pieceCount < 1) return;
+    if (interactiveColor !== data.pieceColor) return;
+    const piece = { role: data.pieceRole, color: data.pieceColor };
+    const event = data.event;
+    chessground.dragNewPiece(piece, event);
+  }
 </script>
 
 <div class="flex flex-col">
-  <Meta
-    isMyChessground="{isMyChessground}"
-    chessground="{chessground}"
-    color="{topColor}"
-    sparePawnCount="{topSparePawnCount}"
-    spareKnightCount="{topSpareKnightCount}"
-    spareBishopCount="{topSpareBishopCount}"
-    spareRookCount="{topSpareRookCount}"
-    spareQueenCount="{topSpareQueenCount}"
-    avatarIcon="{topAvatarIcon}"
-    clockMinutes="{topClockMinutes}"
-    clockSeconds="{topClockSeconds}"
-  />
+  {#if topColor == 'white'}
+    <Meta
+      color="white"
+      icon="{whiteIcon}"
+      clock="{whiteClock}"
+      spares="{whiteSpares}"
+      on:spareDragNewPiece="{spareDragNewPiece}"
+    />
+  {:else}
+    <Meta
+      color="black"
+      icon="{blackIcon}"
+      clock="{blackClock}"
+      spares="{blackSpares}"
+      on:spareDragNewPiece="{spareDragNewPiece}"
+    />
+  {/if}
   <Chessground bind:chessground config="{chessgroundConfig}" />
-  <Meta
-    isMyChessground="{isMyChessground}"
-    chessground="{chessground}"
-    color="{bottomColor}"
-    sparePawnCount="{bottomSparePawnCount}"
-    spareKnightCount="{bottomSpareKnightCount}"
-    spareBishopCount="{bottomSpareBishopCount}"
-    spareRookCount="{bottomSpareRookCount}"
-    spareQueenCount="{bottomSpareQueenCount}"
-    avatarIcon="{bottomAvatarIcon}"
-    clockMinutes="{bottomClockMinutes}"
-    clockSeconds="{bottomClockSeconds}"
-  />
+  {#if bottomColor == 'white'}
+    <Meta
+      color="white"
+      icon="{whiteIcon}"
+      clock="{whiteClock}"
+      spares="{whiteSpares}"
+      on:spareDragNewPiece="{spareDragNewPiece}"
+    />
+  {:else}
+    <Meta
+      color="black"
+      icon="{blackIcon}"
+      clock="{blackClock}"
+      spares="{blackSpares}"
+      on:spareDragNewPiece="{spareDragNewPiece}"
+    />
+  {/if}
 </div>

@@ -5,6 +5,6 @@ module.exports = {
   tabWidth: 2,
   svelteSortOrder: "scripts-styles-markup",
   svelteStrictMode: true,
-  svelteAllowShorthand: false,
+  svelteAllowShorthand: true,
   svelteBracketNewLine: true,
 };

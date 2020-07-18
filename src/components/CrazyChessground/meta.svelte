@@ -1,53 +1,49 @@
 <script lang="typescript">
-  import Spares from "./spares.svelte";
-  import Avatar from "./avatar.svelte";
-  import Clock from "./clock.svelte";
+  import { createEventDispatcher } from "svelte";
 
   import { Api } from "chessground/api";
   import * as cgtypes from "chessground/types";
 
-  export let isMyChessground: boolean;
-  export let chessground: Api;
+  import Spares from "./spares.svelte";
+  import Avatar from "./avatar.svelte";
+  import Clock from "./clock.svelte";
+
+  export let icon: string;
+  export let clock: {
+    waiting: boolean;
+    minutes: number;
+    seconds: number;
+  };
   export let color: cgtypes.Color;
-  export let sparePawnCount: number;
-  export let spareKnightCount: number;
-  export let spareBishopCount: number;
-  export let spareRookCount: number;
-  export let spareQueenCount: number;
-  export let avatarIcon: string;
-  export let clockMinutes: number;
-  export let clockSeconds: number;
+  export let spares: any;
+
+  const dispatch = createEventDispatcher();
+
+  function forward(name: string, event: Event) {
+    dispatch(name, (event as CustomEvent).detail);
+  }
 </script>
-
-<style global>
-  .pb-1\/8 {
-    padding-bottom: 12.5%;
-  }
-
-  .w-1\/8 {
-    width: 12.5%;
-  }
-</style>
 
 <div class="relative w-full my-1 pb-1/8">
   <div class="absolute table bottom-0 w-1/8 pb-1/8">
     <div class="absolute h-full bottom-0 flex flex-row" style="width: 800%;">
       <div class="bg-gray-200 border border-gray-400 inline-block w-1/8">
-        <Avatar icon="{avatarIcon}" />
+        <Avatar {icon} />
       </div>
-      <div class="inline-block w-1/4 bg-green-600">
-        <Clock minutes="{clockMinutes}" seconds="{clockSeconds}" />
+      <div class="inline-block w-1/4">
+        <Clock waiting="{clock.waiting}" minutes="{clock.minutes}" seconds="{clock.seconds}" />
       </div>
       <div class="bg-gray-200 border border-gray-400 flex" style="width: 62.5%;">
         <Spares
-          isMyChessground="{isMyChessground}"
-          chessground="{chessground}"
-          color="{color}"
-          pawnCount="{sparePawnCount}"
-          knightCount="{spareKnightCount}"
-          bishopCount="{spareBishopCount}"
-          rookCount="{spareRookCount}"
-          queenCount="{spareQueenCount}"
+          on:dragNewPiece="{(e) => forward('spareDragNewPiece', e)}"
+          {color}
+          dropType="{spares.dropType}"
+          dropPiece="{spares.dropPiece}"
+          pawnCount="{spares.pawnCount}"
+          knightCount="{spares.knightCount}"
+          bishopCount="{spares.bishopCount}"
+          rookCount="{spares.rookCount}"
+          queenCount="{spares.queenCount}"
         />
       </div>
     </div>

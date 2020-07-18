@@ -9,7 +9,7 @@
   //@ts-ignore
   export let chessground: Api = undefined;
 
-  const defaultCgconfig: Config = {
+  const defaultConfig: Config = {
     disableContextMenu: true,
     drawable: {
       enabled: false,
@@ -18,7 +18,7 @@
 
   let cgdiv: any;
   onMount(() => {
-    chessground = Chessground(cgdiv, { ...defaultCgconfig, ...config });
+    chessground = Chessground(cgdiv, { ...defaultConfig, ...config });
   });
 
   onDestroy(() => {
