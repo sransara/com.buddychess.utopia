@@ -1,4 +1,6 @@
 import Home from "./pages/Home.svelte";
+import Lounge from "./pages/Lounge.svelte";
+import Room from "./pages/Room.svelte";
 import Game from "./pages/Game/index.svelte";
 
 type routeMeta = { location: string; path: string; title: string; component: any };
@@ -9,8 +11,8 @@ function location(routeMeta: routeMeta): [string, routeMeta] {
 
 export const locationMap = new Map([
   location({ location: "/", path: "/", title: "Home", component: Home }),
-  location({ location: "/lounge", path: "/lounge", title: "Lounge", component: Home }),
-  location({ location: "/room", path: "/room", title: "Room", component: Home }),
+  location({ location: "/lounge", path: "/lounge", title: "Lounge", component: Lounge }),
+  location({ location: "/room", path: "/room", title: "Room", component: Room }),
   location({ location: "/game", path: "/game", title: "Game", component: Game }),
 ]);
 

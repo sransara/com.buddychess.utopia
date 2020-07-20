@@ -2,7 +2,7 @@
   import { link, location } from "svelte-spa-router";
   import { fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
-  import { pages } from "./routes";
+  import { locationMap, pages } from "./routes";
 
   export let openSidebar: boolean;
 
@@ -22,7 +22,7 @@
     </span>
     Buddy Chess
   </button>
-
+  : {locationMap.get($location)?.title}
 </header>
 
 {#if openSidebar}
