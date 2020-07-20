@@ -5,7 +5,7 @@
   import * as cgtypes from "chessground/types";
 
   import Spares from "./spares.svelte";
-  import Avatar from "./avatar.svelte";
+  import Avatar from "../Avatar/index.svelte";
   import Clock from "./clock.svelte";
 
   export let icon: string;
