@@ -1,7 +1,8 @@
 <script lang="typescript">
-  import { onMount } from "svelte";
-
+  import { onMount, onDestroy } from "svelte";
+  import Splash from "./splash.svelte";
   import BuddyChessground from "../../components/BuddyChessground.svelte";
+  import Sidebar from "./sidebar.svelte";
 
   import { Api } from "chessground/api";
   import { Config } from "chessground/config";
@@ -86,6 +87,46 @@
   }
   // end:chess.js extensions
 
+  // just a hacky way to fit the game view to window sizes
+  // - resize game view to fill window height
+  // - but make sure not to overflow on the x-axis
+  // - TODO: make sure a square is not too big
+  let visibleSplash = true;
+  // @ts-ignore
+  let buddyChessground: HTMLElement = undefined;
+  function fitBuddyChessground() {
+    const rect = buddyChessground.getBoundingClientRect();
+    const nextH = window.innerHeight - rect.top - 10;
+    const currentW = rect.right - rect.left;
+    const currentH = rect.bottom - rect.top;
+    let nextW = (nextH * currentW) / currentH;
+    const maxW = (window.innerWidth * 5) / 6;
+    nextW = Math.min(nextW, maxW);
+    buddyChessground.style.width = `${nextW}px`;
+  }
+  // @ts-ignore
+  let sidebar: HTMLElement = undefined;
+  function fitSidebar() {
+    const rect = sidebar.getBoundingClientRect();
+    const nextW = window.innerWidth - rect.left - 10;
+    sidebar.style.width = `${nextW}px`;
+    // sidebar.style.height = `${nextH}px`;
+  }
+  function fitViewport() {
+    fitBuddyChessground();
+    fitSidebar();
+  }
+  onMount(() => {
+    window.addEventListener("resize", fitViewport);
+    setTimeout(() => {
+      fitViewport();
+      visibleSplash = false;
+    }, 1000);
+  });
+  onDestroy(() => {
+    window.removeEventListener("resize", fitViewport);
+  });
+
   const myColor: cgtypes.Color = "white";
   const myChess = new Chess();
 
@@ -108,6 +149,20 @@
   // @ts-ignore
   let aChessground: Api = undefined;
   const aChessgroundConfig: Config = {
+    orientation: myColor == "white" ? "black" : "white",
+    viewOnly: true,
+  };
+  let aInteractiveColor: cgtypes.Color | false = false;
+  let aWhiteIcon = "rabbit";
+  let aWhiteClock = { ...initClockState };
+  let aWhiteSpares = { ...initSpareState };
+  let aBlackIcon = "monkey";
+  let aBlackClock = { ...initClockState };
+  let aBlackSpares = { ...initSpareState };
+
+  // @ts-ignore
+  let bChessground: Api = undefined;
+  const bChessgroundConfig: Config = {
     orientation: myColor,
     turnColor: "white",
     movable: {
@@ -126,45 +181,48 @@
       enabled: true,
     },
   };
-  let aWhiteIcon = "elephant";
-  let aWhiteClock = { ...initClockState };
-  let aWhiteSpares = { ...initSpareState };
-  let aBlackIcon = "giraffe";
-  let aBlackClock = { ...initClockState };
-  let aBlackSpares = { ...initSpareState };
-
-  // @ts-ignore
-  let bChessground: Api = undefined;
-  const bChessgroundConfig: Config = {
-    orientation: myColor == "white" ? "black" : "white",
-    viewOnly: true,
-  };
-  let bInteractiveColor = false;
-  let bWhiteIcon = "rabbit";
+  let bInteractiveColor: cgtypes.Color | false = "white";
+  let bWhiteIcon = "elephant";
   let bWhiteClock = { ...initClockState };
   let bWhiteSpares = { ...initSpareState };
-  let bBlackIcon = "monkey";
+  let bBlackIcon = "giraffe";
   let bBlackClock = { ...initClockState };
   let bBlackSpares = { ...initSpareState };
 </script>
 
-<BuddyChessground
-  bind:aChessground
-  {aChessgroundConfig}
-  aInteractiveColor="{myColor}"
-  {aWhiteIcon}
-  {aWhiteClock}
-  {aWhiteSpares}
-  {aBlackIcon}
-  {aBlackClock}
-  {aBlackSpares}
-  bind:bChessground
-  {bChessgroundConfig}
-  {bInteractiveColor}
-  {bWhiteIcon}
-  {bWhiteClock}
-  {bWhiteSpares}
-  {bBlackIcon}
-  {bBlackClock}
-  {bBlackSpares}
-/>
+{#if visibleSplash}
+  <Splash
+    aOrientation="{aChessgroundConfig.orientation === 'white' ? 'white' : 'black'}"
+    {aInteractiveColor}
+    {aWhiteIcon}
+    {aBlackIcon}
+    bOrientation="{bChessgroundConfig.orientation === 'white' ? 'white' : 'black'}"
+    {bInteractiveColor}
+    {bWhiteIcon}
+    {bBlackIcon}
+  />
+{/if}
+<div class="flex w-full">
+  <BuddyChessground
+    bind:buddyChessground
+    bind:aChessground
+    {aChessgroundConfig}
+    {aInteractiveColor}
+    {aWhiteIcon}
+    {aWhiteClock}
+    {aWhiteSpares}
+    {aBlackIcon}
+    {aBlackClock}
+    {aBlackSpares}
+    bind:bChessground
+    {bChessgroundConfig}
+    {bInteractiveColor}
+    {bWhiteIcon}
+    {bWhiteClock}
+    {bWhiteSpares}
+    {bBlackIcon}
+    {bBlackClock}
+    {bBlackSpares}
+  />
+  <Sidebar bind:sidebar />
+</div>

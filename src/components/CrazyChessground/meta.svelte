@@ -27,10 +27,10 @@
 <div class="relative w-full my-1 pb-1/8">
   <div class="absolute table bottom-0 w-1/8 pb-1/8">
     <div class="absolute h-full bottom-0 flex flex-row" style="width: 800%;">
-      <div class="bg-gray-200 border border-gray-400 inline-block w-1/8">
+      <div class="bg-gray-200 border border-gray-400 inline-block w-1/8 cursor-default">
         <Avatar {icon} />
       </div>
-      <div class="inline-block w-1/4">
+      <div class="inline-block w-1/4 cursor-default">
         <Clock waiting="{clock.waiting}" minutes="{clock.minutes}" seconds="{clock.seconds}" />
       </div>
       <div class="bg-gray-200 border border-gray-400 flex" style="width: 62.5%;">

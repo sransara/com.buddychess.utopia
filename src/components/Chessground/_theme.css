@@ -2,6 +2,14 @@ cg-board {
   background-image: url("./images/board.svg");
 }
 
+.cg-square.light {
+  background-color: #f0d9b5;
+}
+
+.cg-square.dark {
+  background-color: #b58863;
+}
+
 .cg-piece.pawn.white,
 piece.pawn.white {
   background-image: url("./images/pieces/wP.svg");

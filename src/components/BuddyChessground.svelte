@@ -1,6 +1,4 @@
 <script lang="typescript">
-  import { onMount } from "svelte";
-
   import CrazyChessground from "./CrazyChessground/index.svelte";
 
   import { Api } from "chessground/api";
@@ -20,23 +18,8 @@
     queenCount: number;
   };
 
-  // just a hacky way to fit the game view to window sizes
-  // - resize game view to fill window height
-  // - but make sure not to overflow on the x-axis
-  // - TODO: make sure a square is not too big
-  let gameViewDiv: any;
-  function fitGameView() {
-    if (!gameViewDiv) return;
-    let y = window.innerHeight - gameViewDiv.offsetTop - 5;
-    const rect = gameViewDiv.getBoundingClientRect();
-    let w = rect.right - rect.left;
-    let h = rect.bottom - rect.top;
-    let x = (y * w) / h;
-    gameViewDiv.style.width = `${Math.min(x, window.innerWidth)}px`;
-  }
-  let clientWidth: number;
-  $: clientWidth && fitGameView();
-  window.addEventListener("resize", fitGameView);
+  // @ts-ignore
+  export let buddyChessground: HTMLElement = undefined;
 
   // @ts-ignore
   export let aChessground: Api = undefined;
@@ -61,8 +44,8 @@
   export let bBlackSpares: SpareState;
 </script>
 
-<div bind:this="{gameViewDiv}" bind:clientWidth class="select-none px-2 flex">
-  <div class="w-1/2 mr-2 inline-block">
+<div bind:this="{buddyChessground}" class="select-none px-2 flex flex-grow-0 overflow-hidden" style="width: 50vw;">
+  <div class="w-1/2 mr-2 inline-block {aInteractiveColor ? 'cursor-pointer' : 'cursor-default'}">
     <CrazyChessground
       bind:chessground="{aChessground}"
       chessgroundConfig="{aChessgroundConfig}"
@@ -75,7 +58,7 @@
       blackSpares="{aBlackSpares}"
     />
   </div>
-  <div class="w-1/2 ml-2 inline-block">
+  <div class="w-1/2 ml-2 inline-block {bInteractiveColor ? 'cursor-pointer' : 'cursor-default'} ">
     <CrazyChessground
       bind:chessground="{bChessground}"
       chessgroundConfig="{bChessgroundConfig}"
