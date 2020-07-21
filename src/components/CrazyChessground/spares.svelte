@@ -1,6 +1,8 @@
 <script lang="typescript">
   import { createEventDispatcher } from "svelte";
 
+  import Piece from "../Piece.svelte";
+
   import { Api } from "chessground/api";
   import * as cgtypes from "chessground/types";
 
@@ -42,7 +44,6 @@
 
   span:not([data-count="0"]) {
     opacity: 1;
-    cursor: pointer;
   }
 
   span:not([data-count="0"])::after {
@@ -69,7 +70,7 @@
 </style>
 
 <span
-  class="h-full w-1/5 bg-cover inline-block relative cg-piece pawn {color}"
+  class="h-full w-1/5 inline-block relative"
   class:drop="{dropType == 'drop' && dropPiece == 'pawn'}"
   class:predrop="{dropType == 'predrop' && dropPiece == 'pawn'}"
   data-role="pawn"
@@ -77,10 +78,12 @@
   data-count="{pawnCount}"
   on:mousedown="{dragNewPiece}"
   on:touchstart="{dragNewPiece}"
-></span>
+>
+  <Piece role="pawn" {color} />
+</span>
 
 <span
-  class="h-full w-1/5 bg-cover inline-block relative cg-piece knight {color}"
+  class="h-full w-1/5 inline-block relative"
   class:drop="{dropType == 'drop' && dropPiece == 'knight'}"
   class:predrop="{dropType == 'predrop' && dropPiece == 'knight'}"
   data-role="knight"
@@ -88,10 +91,12 @@
   data-count="{knightCount}"
   on:mousedown="{dragNewPiece}"
   on:touchstart="{dragNewPiece}"
-></span>
+>
+  <Piece role="knight" {color} />
+</span>
 
 <span
-  class="h-full w-1/5 bg-cover inline-block relative cg-piece bishop {color}"
+  class="h-full w-1/5 inline-block relative"
   class:drop="{dropType == 'drop' && dropPiece == 'bishop'}"
   class:predrop="{dropType == 'predrop' && dropPiece == 'bishop'}"
   data-role="bishop"
@@ -99,10 +104,12 @@
   data-count="{bishopCount}"
   on:mousedown="{dragNewPiece}"
   on:touchstart="{dragNewPiece}"
-></span>
+>
+  <Piece role="bishop" {color} />
+</span>
 
 <span
-  class="h-full w-1/5 bg-cover inline-block relative cg-piece rook {color}"
+  class="h-full w-1/5 inline-block relative"
   class:drop="{dropType == 'drop' && dropPiece == 'rook'}"
   class:predrop="{dropType == 'predrop' && dropPiece == 'rook'}"
   data-role="rook"
@@ -110,10 +117,12 @@
   data-count="{rookCount}"
   on:mousedown="{dragNewPiece}"
   on:touchstart="{dragNewPiece}"
-></span>
+>
+  <Piece role="rook" {color} />
+</span>
 
 <span
-  class="h-full w-1/5 bg-cover inline-block relative cg-piece queen {color}"
+  class="h-full w-1/5 inline-block relative"
   class:drop="{dropType == 'drop' && dropPiece == 'queen'}"
   class:predrop="{dropType == 'predrop' && dropPiece == 'queen'}"
   data-role="queen"
@@ -121,4 +130,6 @@
   data-count="{queenCount}"
   on:mousedown="{dragNewPiece}"
   on:touchstart="{dragNewPiece}"
-></span>
+>
+  <Piece role="queen" {color} />
+</span>
