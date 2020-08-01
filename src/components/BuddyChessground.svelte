@@ -44,8 +44,8 @@
   export let bBlackSpares: SpareState;
 </script>
 
-<div bind:this="{buddyChessground}" class="select-none px-2 flex flex-grow-0 overflow-hidden" style="width: 50vw;">
-  <div class="w-1/2 mr-2 inline-block {aInteractiveColor ? 'cursor-pointer' : 'cursor-default'}">
+<div bind:this="{buddyChessground}" class="flex select-none px-2" style="width: 50vw;">
+  <div class="w-1/2 pr-2 inline-block {aInteractiveColor ? 'cursor-pointer' : 'cursor-default'}">
     <CrazyChessground
       bind:chessground="{aChessground}"
       chessgroundConfig="{aChessgroundConfig}"
@@ -58,7 +58,7 @@
       blackSpares="{aBlackSpares}"
     />
   </div>
-  <div class="w-1/2 ml-2 inline-block {bInteractiveColor ? 'cursor-pointer' : 'cursor-default'} ">
+  <div class="w-1/2 pl-2 inline-block {bInteractiveColor ? 'cursor-pointer' : 'cursor-default'} ">
     <CrazyChessground
       bind:chessground="{bChessground}"
       chessgroundConfig="{bChessgroundConfig}"

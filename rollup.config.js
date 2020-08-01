@@ -47,7 +47,7 @@ export default {
       dedupe: ["svelte"],
     }),
     commonjs(),
-    typescript(),
+    typescript({ sourceMap: !production }),
 
     // In dev mode, call `npm run start` once
     // the bundle has been generated
@@ -67,18 +67,22 @@ export default {
 };
 
 function serve() {
-  let started = false;
+  let server;
+
+  function toExit() {
+    if (server) server.kill(0);
+  }
 
   return {
     writeBundle() {
-      if (!started) {
-        started = true;
+      if (server) return;
+      server = require("child_process").spawn("npm", ["run", "start", "--", "--dev"], {
+        stdio: ["ignore", "inherit", "inherit"],
+        shell: true,
+      });
 
-        require("child_process").spawn("npm", ["run", "start", "--", "--dev"], {
-          stdio: ["ignore", "inherit", "inherit"],
-          shell: true,
-        });
-      }
+      process.on("SIGTERM", toExit);
+      process.on("exit", toExit);
     },
   };
 }

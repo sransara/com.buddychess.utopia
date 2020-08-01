@@ -2,7 +2,8 @@
   import { onMount, onDestroy } from "svelte";
   import Splash from "./splash.svelte";
   import BuddyChessground from "../../components/BuddyChessground.svelte";
-  import Sidebar from "./sidebar.svelte";
+  import Sidebar from "../../components/Sidebar.svelte";
+  import { convertRemToPixels } from "../../common/utils";
 
   import { Api } from "chessground/api";
   import { Config } from "chessground/config";
@@ -94,29 +95,20 @@
   let visibleSplash = true;
   // @ts-ignore
   let buddyChessground: HTMLElement = undefined;
-  function fitBuddyChessground() {
+  function fitViewport() {
+    // assume scroll bar width: 15
     const rect = buddyChessground.getBoundingClientRect();
-    const nextH = window.innerHeight - rect.top - 10;
+    const nextH = Math.floor(window.innerHeight - convertRemToPixels(5));
     const currentW = rect.right - rect.left;
     const currentH = rect.bottom - rect.top;
     let nextW = (nextH * currentW) / currentH;
-    const maxW = (window.innerWidth * 5) / 6;
+    const maxW = (window.innerWidth * 4) / 5 - 15;
     nextW = Math.min(nextW, maxW);
-    buddyChessground.style.width = `${nextW}px`;
+    buddyChessground.style.width = `${Math.floor(nextW)}px`;
   }
-  // @ts-ignore
-  let sidebar: HTMLElement = undefined;
-  function fitSidebar() {
-    const rect = sidebar.getBoundingClientRect();
-    const nextW = window.innerWidth - rect.left - 10;
-    sidebar.style.width = `${nextW}px`;
-    // sidebar.style.height = `${nextH}px`;
-  }
-  function fitViewport() {
-    fitBuddyChessground();
-    fitSidebar();
-  }
+
   onMount(() => {
+    document.body.style.overflow = "hidden";
     window.addEventListener("resize", fitViewport);
     setTimeout(() => {
       fitViewport();
@@ -124,6 +116,7 @@
     }, 1000);
   });
   onDestroy(() => {
+    document.body.style.overflow = "auto";
     window.removeEventListener("resize", fitViewport);
   });
 
@@ -202,27 +195,42 @@
     {bBlackIcon}
   />
 {/if}
-<div class="flex w-full">
-  <BuddyChessground
-    bind:buddyChessground
-    bind:aChessground
-    {aChessgroundConfig}
-    {aInteractiveColor}
-    {aWhiteIcon}
-    {aWhiteClock}
-    {aWhiteSpares}
-    {aBlackIcon}
-    {aBlackClock}
-    {aBlackSpares}
-    bind:bChessground
-    {bChessgroundConfig}
-    {bInteractiveColor}
-    {bWhiteIcon}
-    {bWhiteClock}
-    {bWhiteSpares}
-    {bBlackIcon}
-    {bBlackClock}
-    {bBlackSpares}
-  />
-  <Sidebar bind:sidebar />
+<div class="w-full h-full overflow-hidden flex items-center justify-between">
+  <div class="inline-block my-0 mx-auto">
+    <BuddyChessground
+      bind:buddyChessground
+      bind:aChessground
+      {aChessgroundConfig}
+      {aInteractiveColor}
+      {aWhiteIcon}
+      {aWhiteClock}
+      {aWhiteSpares}
+      {aBlackIcon}
+      {aBlackClock}
+      {aBlackSpares}
+      bind:bChessground
+      {bChessgroundConfig}
+      {bInteractiveColor}
+      {bWhiteIcon}
+      {bWhiteClock}
+      {bWhiteSpares}
+      {bBlackIcon}
+      {bBlackClock}
+      {bBlackSpares}
+    />
+  </div>
+  <Sidebar>
+    <div class="container mb-1 border border-gray-400">
+      <div class="p-1 bg-gray-800 text-gray-200 whitespace-no-wrap">Room overview</div>
+      <div></div>
+    </div>
+    <div class="container mb-1 border border-gray-400">
+      <div class="p-1 bg-gray-800 text-gray-200 whitespace-no-wrap">Actions</div>
+      <div>a</div>
+    </div>
+    <div class="flex-grow container border border-gray-400">
+      <div class="p-1 bg-gray-800 text-gray-200 whitespace-no-wrap">Room chat</div>
+      <div></div>
+    </div>
+  </Sidebar>
 </div>
