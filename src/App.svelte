@@ -1,18 +1,21 @@
 <script lang="typescript">
-  import Navbar from "./Navbar.svelte";
   import Router from "svelte-spa-router";
   import { location } from "svelte-spa-router";
-  import { locationMap, routes } from "./routes";
+  import { routes } from "./routes";
+
+  import Navbar from "./Navbar.svelte";
 
   let openSidebar = false;
-
-  function closeSidebar() {
+  let currentRoute: any = { title: "Home", location: "/" };
+  function routeLoaded(event: any): any {
     openSidebar = false;
+    currentRoute = event.detail.userData;
   }
 </script>
 
 <svelte:head>
-  <title>Buddy Chess: {locationMap.get($location)?.title}</title>
+  <title>Buddy Chess: {currentRoute.title}</title>
 </svelte:head>
-<Navbar bind:openSidebar />
-<Router {routes} on:routeLoaded="{closeSidebar}" />
+
+<Navbar bind:openSidebar route="{currentRoute}" />
+<Router {routes} on:routeLoaded="{routeLoaded}" />

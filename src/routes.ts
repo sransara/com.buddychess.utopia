@@ -1,27 +1,15 @@
 import Home from "./pages/Home.svelte";
-import Lounge from "./pages/Lounge.svelte";
-import Room from "./pages/Room.svelte";
+import Room from "./pages/Room/index.svelte";
 import Game from "./pages/Game/index.svelte";
+import { wrap } from "svelte-spa-router";
 
-type routeMeta = { location: string; path: string; title: string; component: any };
+type routeMeta = { location: string; path: string; component: any; title: string };
 
-function location(routeMeta: routeMeta): [string, routeMeta] {
-  return [routeMeta.location, routeMeta];
-}
+export const menu: routeMeta[] = [
+  { location: "/", path: "/", component: Home, title: "Home" },
+  { location: "/room", path: "/room/:id?", component: Room, title: "Room" },
+];
 
-export const locationMap = new Map([
-  location({ location: "/", path: "/", title: "Home", component: Home }),
-  location({ location: "/lounge", path: "/lounge", title: "Lounge", component: Lounge }),
-  location({ location: "/room", path: "/room", title: "Room", component: Room }),
-  location({ location: "/game", path: "/game", title: "Game", component: Game }),
-]);
+export const pages = [...menu, ...[{ location: "/game", path: "/game/:id", component: Game, title: "Game" }]];
 
-export const pages = Array.from(locationMap).map(([_, routeMeta]) => {
-  return routeMeta;
-});
-
-export const routes = new Map(
-  Array.from(locationMap).map(([_, routeMeta]) => {
-    return [routeMeta.path, routeMeta.component];
-  })
-);
+export const routes = new Map(pages.map((page) => [page.path, wrap(page.component, page)]));

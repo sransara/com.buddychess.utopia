@@ -1,9 +1,10 @@
 <script lang="typescript">
   import { link, location } from "svelte-spa-router";
   import { fly } from "svelte/transition";
-  import { locationMap, pages } from "./routes";
+  import { menu } from "./routes";
 
   export let openSidebar: boolean;
+  export let route: any;
 
   function toggleOpenSidebar() {
     openSidebar = !openSidebar;
@@ -21,14 +22,14 @@
     </span>
     Buddy Chess
   </button>
-  : {locationMap.get($location)?.title}
+  : {route.title}
 </header>
 
 {#if openSidebar}
   <aside transition:fly class="z-10 absolute bg-gray-800 text-gray-500 border-t border-gray-600 text-3xl w-64">
-    {#each pages as page}
+    {#each menu as page}
       <a
-        class="block hover:text-gray-200 {$location == page.location ? 'text-gray-200' : ''}"
+        class="block hover:text-gray-200 {page.location == route.location ? 'text-gray-200' : ''}"
         href="{page.location}"
         use:link
       >
