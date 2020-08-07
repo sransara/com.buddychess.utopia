@@ -180,6 +180,7 @@
 
       peerConnection.addEventListener("negotiationneeded", async (event) => {
         const offer = await peerConnection.createOffer();
+        if (peerConnection.signalingState != "stable") return;
         await peerConnection.setLocalDescription(offer);
         const sessionDescription = {
           type: offer.type,
