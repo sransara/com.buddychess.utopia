@@ -7,11 +7,11 @@ const buddyChessPseudoPK = Uint8Array.from([120,180,156,202,205,250,67,107,156,2
 // prettier-ignore
 const buddyChessPseudoSK = Uint8Array.from([113,109,133,216,29,154,30,239,165,44,165,130,112,83,45,172,9,72,53,119,45,171,21,195,162,219,93,222,245,158,122,170,]);
 
-export const encrypt = (recieverPublicKeyB64: string, payload: any): string => {
+export const encrypt = (recieverPublicKeyB64: string, payload: string): string => {
   const recieverPublicKey = decodeBase64(recieverPublicKeyB64);
 
   const nonce = randomBytes(box.nonceLength);
-  const payloadBytes = decodeUTF8(JSON.stringify(payload));
+  const payloadBytes = decodeUTF8(payload);
   const encryptedPayloadBytes = box(payloadBytes, nonce, recieverPublicKey, buddyChessPseudoSK);
 
   const wrappedEncryptedPayloadBytes = new Uint8Array(box.nonceLength + encryptedPayloadBytes.length);
@@ -35,7 +35,7 @@ export const decrypt = (recieverSecretKey: Uint8Array, wrappedEncryptedPayloadB6
     throw new Error("Could not decrypt message");
   }
 
-  return JSON.parse(encodeUTF8(decryptedPayloadBytes));
+  return encodeUTF8(decryptedPayloadBytes);
 };
 
 const myKeypair = box.keyPair();

@@ -1,5 +1,6 @@
 import Home from "./pages/Home.svelte";
-import Room from "./pages/Room/index.svelte";
+import RoomCreate from "./pages/Room/Create.svelte";
+import RoomJoin from "./pages/Room/Join.svelte";
 import Game from "./pages/Game/index.svelte";
 import { wrap } from "svelte-spa-router";
 
@@ -7,7 +8,8 @@ type routeMeta = { location: string; path: string; component: any; title: string
 
 export const menu: routeMeta[] = [
   { location: "/", path: "/", component: Home, title: "Home" },
-  { location: "/room", path: "/room/:id?", component: Room, title: "Room" },
+  { location: "/room/create", path: "/room/create/:id?", component: RoomCreate, title: "Create Room" },
+  { location: "/room/join", path: "/room/join/:id?", component: RoomJoin, title: "Join Room" },
 ];
 
 export const pages = [...menu, ...[{ location: "/game", path: "/game/:id", component: Game, title: "Game" }]];
