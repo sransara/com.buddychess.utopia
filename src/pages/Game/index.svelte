@@ -1,17 +1,44 @@
 <script lang="typescript">
-  import { onMount, onDestroy } from "svelte";
   import Splash from "./splash.svelte";
   import BuddyChessground from "../../components/BuddyChessground.svelte";
   import Sidebar from "../../components/Sidebar.svelte";
-  import { convertRemToPixels } from "../../common/utils";
+
+  import { onMount, onDestroy } from "svelte";
+  import { replace } from "svelte-spa-router";
+
+  import { _roomId$, roomId$, _playerId$, playerId$, spots$, _gamen$, gamen$, wizard$ } from "../../common/datastore";
+  import * as global from "../../common/dataglobal";
+  import * as msgbus from "../../common/msgbus";
+  import * as wizard from "../../common/wizard";
+  import * as utils from "../../common/utils";
 
   import { Api } from "chessground/api";
   import { Config } from "chessground/config";
   import * as cgtypes from "chessground/types";
-
   import { Chess } from "chess.js";
   import * as chtypes from "chess.js";
 
+  export let params: any = {};
+
+  /*
+  $: if (wizard.isAfter($wizard$, wizard.steps.WAIT_FOR_SPOTS)) {
+    if ($playerId$ == "host") {
+      if (params.action != "create" || params.id != $roomId$) {
+        replace(`/game/create/${$roomId$}`);
+      }
+    } else if (params.action != "join" || params.id != $roomId$) {
+      replace(`/game/join/${$roomId$}`);
+    }
+  } else if ($_roomId$ && $_playerId$) {
+    if ($_playerId$ == "host") {
+      replace(`/room/create/${$_roomId$}`);
+    } else {
+      replace(`/room/join/${$_roomId$}`);
+    }
+  } else {
+    replace("/");
+  }
+*/
   // begin:chess.js extensions
   function fenNextTurn(fen: cgtypes.FEN): cgtypes.FEN {
     // rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1
@@ -98,7 +125,7 @@
   function fitViewport() {
     // assume scroll bar width: 15
     const rect = buddyChessground.getBoundingClientRect();
-    const nextH = Math.floor(window.innerHeight - convertRemToPixels(5));
+    const nextH = Math.floor(window.innerHeight - utils.convertRemToPixels(5));
     const currentW = rect.right - rect.left;
     const currentH = rect.bottom - rect.top;
     let nextW = (nextH * currentW) / currentH;

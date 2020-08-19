@@ -12,6 +12,6 @@ export const menu: routeMeta[] = [
   { location: "/room/join", path: "/room/join/:id?", component: RoomJoin, title: "Join Room" },
 ];
 
-export const pages = [...menu, ...[{ location: "/game", path: "/game/:id", component: Game, title: "Game" }]];
+export const pages = [...menu, ...[{ location: "/game", path: "/game/:action/:id", component: Game, title: "Game" }]];
 
 export const routes = new Map(pages.map((page) => [page.path, wrap(page.component, page)]));

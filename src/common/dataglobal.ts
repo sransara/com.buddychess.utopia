@@ -1,4 +1,7 @@
-export const avatarIcons = ["elephant", "giraffe", "monkey", "rabbit"];
-export const teamColors = ["red", "blue"];
+import { DefaultDict } from "./utils";
 
-export let players: any = {};
+export const avatars = ["elephant", "giraffe", "monkey", "rabbit"];
+
+export const teams = ["red", "blue"];
+
+export const players: any = new DefaultDict(Object);

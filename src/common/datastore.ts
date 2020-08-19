@@ -1,16 +1,15 @@
 import { writable } from "svelte/store";
 
-export const roomId = writable((undefined as unknown) as string);
+export const _roomId$ = writable((undefined as unknown) as string);
+export const roomId$ = writable((undefined as unknown) as string);
 
-export const _roomId = writable((undefined as unknown) as string);
+export const _playerId$ = writable((undefined as unknown) as string);
+export const playerId$ = writable((undefined as unknown) as string);
 
-export const playerId = writable((undefined as unknown) as string);
+export const spots$ = writable({} as any);
 
-export const _playerId = writable((undefined as unknown) as string);
+export const _gamen$ = writable(0 as number);
+export const gamen$ = writable(0 as number);
 
-type wizardStep = { currStep: number; currStepStatus: "todo" | "doing" };
-export const roomWizard = writable({ currStep: 1, currStepStatus: "todo" } as wizardStep);
-
-export const spots = writable({} as any);
-
-export const inGame = writable(false as boolean);
+import * as wizard from "./wizard";
+export const wizard$ = writable({ stepn: 1, status: "todo" } as wizard.types.wizard);

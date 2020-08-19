@@ -1,6 +1,7 @@
 <script lang="typescript">
-  import { avatarIcons, teamColors } from "../../common/dataglobal";
   import Avatar from "../../components/Avatar/index.svelte";
+
+  import * as global from "../../common/dataglobal";
 
   export let readonly: boolean;
   export let name: string = "";
@@ -26,33 +27,26 @@
     <div class="flex space-x-4">
       <div class="flex-grow">
         <span class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-1">Avatar</span>
-        {#each avatarIcons as avatarIcon}
+        {#each global.avatars as _avatar}
           <div class="flex items-center">
             <input
               type="radio"
-              id="{avatarIcon}"
-              name="avatarIcon"
+              id="{_avatar}"
+              name="avatar"
               bind:group="{avatar}"
-              value="{avatarIcon}"
+              value="{_avatar}"
               disabled="{readonly}"
             />
-            <label class="text-gray-700 ml-2 flex-grow" for="{avatarIcon}">{avatarIcon}</label>
+            <label class="text-gray-700 ml-2 flex-grow" for="{_avatar}">{_avatar}</label>
           </div>
         {/each}
       </div>
       <div class="flex-grow">
         <span class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-1">Team</span>
-        {#each teamColors as teamColor}
+        {#each global.teams as _team}
           <div class="flex items-center">
-            <input
-              type="radio"
-              id="{teamColor}"
-              name="teamColor"
-              bind:group="{team}"
-              value="{teamColor}"
-              disabled="{readonly}"
-            />
-            <label class="text-gray-700 ml-2 flex-grow" for="{teamColor}">{teamColor}</label>
+            <input type="radio" id="{_team}" name="team" bind:group="{team}" value="{_team}" disabled="{readonly}" />
+            <label class="text-gray-700 ml-2 flex-grow" for="{_team}">{_team}</label>
           </div>
         {/each}
       </div>

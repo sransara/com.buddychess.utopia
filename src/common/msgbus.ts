@@ -2,15 +2,15 @@ import * as firebase from "firebase/app";
 import { encrypt, decrypt } from "./crypto";
 import { EventBusSingleton as EventBus } from "light-event-bus";
 
-let firestoreMsgBusUnsubscriber: any;
+let firestoreUnsubscriber: any;
 
-export function firestoreMsgBusUnsubscribe() {
-  if (firestoreMsgBusUnsubscriber) firestoreMsgBusUnsubscriber();
+export function firestoreUnsubscribe() {
+  if (firestoreUnsubscriber) firestoreUnsubscriber();
 }
 
-export function firestoreMsgBusListen(roomId: string, toId: string, toSecretKey: Uint8Array) {
-  firestoreMsgBusUnsubscribe();
-  firestoreMsgBusUnsubscriber = firebase
+export function firestoreListen(roomId: string, toId: string, toSecretKey: Uint8Array) {
+  firestoreUnsubscribe();
+  firestoreUnsubscriber = firebase
     .firestore()
     .collection("rooms")
     .doc(roomId)
@@ -27,7 +27,7 @@ export function firestoreMsgBusListen(roomId: string, toId: string, toSecretKey:
     });
 }
 
-function firestoreMsgBusSend(
+function firestoreSend(
   roomId: string,
   fromId: string,
   toId: string,
@@ -49,28 +49,23 @@ function firestoreMsgBusSend(
     });
 }
 
-export function dataChannelMsgBusListen(players: any, fromId: string, myId: string) {
-  (players[fromId]["dataChannel"] as RTCDataChannel).addEventListener("message", (event) => {
+export function dataChannelListen(players: any, fromId: string, myId: string) {
+  players[fromId]["dataChannel"].addEventListener("message", (event: MessageEvent) => {
+    players[fromId]["dataChannelListenBeats"].reset();
     const msg = JSON.parse(event.data);
     if (msg["to"] == myId) {
       EventBus.publish(msg.method, msg);
     } else {
-      dataChannelMsgBusSend(players, msg["to"], msg["from"], msg["to"], msg["method"], msg["payload"]);
+      dataChannelSend(players, msg["to"], msg["from"], msg["to"], msg["method"], msg["payload"]);
     }
   });
 }
 
-function dataChannelMsgBusSend(
-  players: any,
-  proxyId: string,
-  fromId: string,
-  toId: string,
-  method: string,
-  payload: any
-) {
-  if (!players[proxyId] || !players[proxyId]["dataChannel"]) return;
-
-  (players[proxyId]["dataChannel"] as RTCDataChannel).send(
+function dataChannelSend(players: any, proxyId: string, fromId: string, toId: string, method: string, payload: any) {
+  if ("dataChannel" in players[proxyId] == false) return;
+  if (players[proxyId]["dataChannel"].readyState != "open") return;
+  players[proxyId]["dataChannelSendBeats"].reset();
+  players[proxyId]["dataChannel"].send(
     JSON.stringify({
       from: fromId,
       to: toId,
@@ -80,14 +75,23 @@ function dataChannelMsgBusSend(
   );
 }
 
-export function msgBusSend(players: any, roomId: string, fromId: string, toId: string, method: string, payload: any) {
+export function send(players: any, roomId: string, fromId: string, toId: string, method: string, payload: any) {
   if (fromId == toId) return;
-  if (players[toId]["dataChannel"] && players[toId]["dataChannel"].readyState == "open") {
-    dataChannelMsgBusSend(players, toId, fromId, toId, method, payload);
-  } else if (players["host"]["dataChannel"]) {
-    // && players["host"]["dataChannel"].readyState == "open") {
-    dataChannelMsgBusSend(players, "host", fromId, toId, method, payload);
+  // console.log(players, fromId, toId, method);
+  if ("dataChannel" in players[toId]) {
+    //  && players[toId]["dataChannel"].readyState == "open"
+    dataChannelSend(players, toId, fromId, toId, method, payload);
+  } else if ("dataChannel" in players["host"]) {
+    // && players["host"]["dataChannel"].readyState == "open"
+    dataChannelSend(players, "host", fromId, toId, method, payload);
   } else {
-    firestoreMsgBusSend(roomId, fromId, toId, players[toId]["publicKey"], method, payload);
+    firestoreSend(roomId, fromId, toId, players[toId]["publicKey"], method, payload);
   }
+}
+
+export function sendAll(players: any, roomId: string, fromId: string, toIds: string[], method: string, payload: any) {
+  toIds.forEach((toId) => {
+    if (toId == fromId) return;
+    send(players, roomId, fromId, toId, method, payload);
+  });
 }
