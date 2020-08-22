@@ -11,11 +11,12 @@
   import { myPublicKey, mySecretKey } from "../../common/crypto";
   import { dbrest } from "../../common/firebase";
   import { initPeerKey, setupPeerConnection, allSpotsInSync } from "./common";
-  import { _roomId$, roomId$, _playerId$, playerId$, spots$, _gamen$, gamen$, wizard$ } from "../../common/datastore";
+  import { _roomId$, roomId$, _playerId$, playerId$, spots$, wizard$ } from "../../common/datastore";
   import * as global from "../../common/dataglobal";
   import * as msgbus from "../../common/msgbus";
   import * as wizard from "../../common/wizard";
   import * as utils from "../../common/utils";
+  import { tick } from "svelte";
 
   export let params: any = {};
 
@@ -39,7 +40,7 @@
 
   async function createRoomSpace() {
     try {
-      $wizard$ = wizard.next($wizard$);
+      $wizard$ = global.state["wizard"] = wizard.next($wizard$);
       $_playerId$ = "host";
       $_roomId$ = "1234";
 
@@ -61,13 +62,50 @@
 
       $playerId$ = $_playerId$;
       $roomId$ = $_roomId$;
-      $wizard$ = wizard.next($wizard$);
+      $wizard$ = global.state["wizard"] = wizard.next($wizard$);
     } catch (err) {
       console.log(err);
     }
   }
 
+  let _spotName: string = "";
+  let _spotAvatar: string = "";
+  let _spotTeam: string = "";
+  let _spotErrors: string[] = [];
+
+  function markYourSpot() {
+    $wizard$ = global.state["wizard"] = wizard.next($wizard$);
+
+    _spotErrors = [];
+    if (!_spotName) {
+      _spotErrors = ["Name is required.", ..._spotErrors];
+    }
+    if (!_spotAvatar) {
+      _spotErrors = ["Avatar is required.", ..._spotErrors];
+    }
+    if (!_spotTeam) {
+      _spotErrors = ["Team is required.", ..._spotErrors];
+    }
+    if (_spotErrors.length) {
+      $wizard$ = global.state["wizard"] = wizard.back($wizard$);
+      return;
+    }
+
+    $spots$ = global.state["spots"] = {
+      [$playerId$]: {
+        name: _spotName,
+        avatar: _spotAvatar,
+        team: _spotTeam,
+      },
+    };
+
+    $wizard$ = global.state["wizard"] = wizard.next($wizard$, subsconce);
+    waitForSpots();
+  }
+
   function subsconce() {
+    global.state["gamen"] = 0;
+
     msgbus.firestoreListen($roomId$, $playerId$, mySecretKey);
 
     EventBus.subscribe("initPeerConnection", async (arg: any) => {
@@ -82,88 +120,77 @@
       const spot = arg.payload;
       let errors: string[] = [];
       const spotskeys = Object.keys($spots$).filter((pid: string) => pid != peerId);
+      if (spotskeys.filter((pid: string) => $spots$[pid]["name"] == spot["name"]).length > 0) {
+        errors = [...errors, `Name: ${spot["name"]} is taken at the moment.`];
+      }
+
+      if (spotskeys.filter((pid: string) => $spots$[pid]["avatar"] == spot["avatar"]).length > 0) {
+        errors = [...errors, `Avatar: ${spot["avatar"]} is taken at the moment.`];
+      }
+
       if (spotskeys.filter((pid: string) => $spots$[pid]["team"] == spot["team"]).length >= 2) {
-        errors = [`Sorry, team ${spot["team"]} is full at the moment.`];
+        errors = [...errors, `Team: ${spot["team"]} is full at the moment.`];
       }
+
       if (spotskeys.length >= 4) {
-        errors = ["Sorry, this room is full at the moment."];
+        errors = ["Sorry. this room is full at the moment."];
       }
+
       if (!errors.length) {
-        $spots$ = { ...$spots$, [peerId]: spot };
+        global.state["spots"][peerId] = spot;
+        $spots$ = global.state["spots"];
       }
       msgbus.send(global.players, $roomId$, $playerId$, peerId, "saveSpotAck", {
         errors: errors,
-        gamen: $gamen$,
-        spots: $spots$,
+        gamen: global.state["gamen"],
+        spots: global.state["spots"],
       });
     });
 
-    EventBus.subscribe("updatedSpots", async () => {
-      if (wizard.isIn($wizard$, wizard.steps.WAIT_FOR_SPOTS, "doing")) {
-        if (allSpotsInSync($spots$, $wizard$, $_gamen$)) {
-          $wizard$ = wizard.next($wizard$);
-          await utils.sleep(5000);
-          replace(`game/create/${$roomId$}`);
+    EventBus.subscribe("updatedSpots", () => {
+      if (wizard.isIn(global.state["wizard"], wizard.steps.WAIT_FOR_SPOTS, "doing")) {
+        if (allSpotsInSync(global.state["spots"], global.state["wizard"], global.state["gamen"] + 1)) {
+          dbrest(`rooms/${$roomId$}/status.json`, { method: "PUT", body: '"full"' });
+          $wizard$ = global.state["wizard"] = wizard.next(global.state["wizard"]);
+          global.state["gamen"] = global.state["gamen"] + 1;
+          replace(`/game/create/${$roomId$}`);
+        }
+      } else if (wizard.isAfter(global.state["wizard"], wizard.steps.WAIT_FOR_SPOTS)) {
+        if (Object.keys(global.state["spots"]).length != 4) {
+          $wizard$ = global.state["wizard"] = wizard.todo(wizard.steps.WAIT_FOR_SPOTS);
+          replace(`/room/create/${$roomId$}`);
         }
       }
     });
 
     EventBus.subscribe("updateSpot", async (arg: any) => {
-      $spots$ = { ...$spots$, ...arg.payload };
+      global.state["spots"][arg.from] = arg.payload[arg.from];
+      $spots$ = global.state["spots"];
       msgbus.sendAll(global.players, $roomId$, $playerId$, Object.keys($spots$), "updateSpots", $spots$);
       EventBus.publish("updatedSpots");
     });
 
     EventBus.subscribe("deletePlayer", async (pid: any) => {
-      if (pid in $spots$) {
-        delete $spots$[pid];
-        $spots$ = $spots$;
+      if (pid in global.state["spots"]) {
+        delete global.state["spots"][pid];
+        $spots$ = global.state["spots"];
         msgbus.sendAll(global.players, $roomId$, $playerId$, Object.keys($spots$), "updateSpots", $spots$);
         EventBus.publish("updatedSpots");
       }
     });
   }
 
-  let _spotName: string = "";
-  let _spotAvatar: string = "";
-  let _spotTeam: string = "";
-  let _spotErrors: string[] = [];
-
-  function markYourSpot() {
-    $wizard$ = wizard.next($wizard$, subsconce);
-
-    _spotErrors = [];
-    if (!_spotName) {
-      _spotErrors = ["Name is required.", ..._spotErrors];
-    }
-    if (!_spotAvatar) {
-      _spotErrors = ["Avatar is required.", ..._spotErrors];
-    }
-    if (!_spotTeam) {
-      _spotErrors = ["Team is required.", ..._spotErrors];
-    }
-    if (_spotErrors.length) {
-      $wizard$ = wizard.back($wizard$);
-      return;
-    }
-
-    $spots$ = {
-      [$playerId$]: {
-        name: _spotName,
-        avatar: _spotAvatar,
-        team: _spotTeam,
-      },
-    };
-
-    $wizard$ = wizard.next($wizard$);
-    waitForSpots();
-  }
-
   if (wizard.isIn($wizard$, wizard.steps.WAIT_FOR_SPOTS, "todo")) waitForSpots();
-  async function waitForSpots() {
-    $wizard$ = wizard.next($wizard$);
-    $_gamen$ = $gamen$ + 1;
-    $spots$ = { ...$spots$, [$playerId$]: { ...$spots$[$playerId$], gamen: $_gamen$ } };
+  function waitForSpots() {
+    $wizard$ = global.state["wizard"] = wizard.next($wizard$);
+    dbrest(`rooms/${$roomId$}/status.json`, { method: "PUT", body: '"open"' });
+
+    $spots$[$playerId$]["wizard"] = $wizard$;
+    $spots$[$playerId$]["gamen"] = global.state["gamen"] + 1;
+    $spots$ = global.state["spots"] = $spots$;
+
+    console.log($spots$, $wizard$, global.state["gamen"]);
+
     msgbus.sendAll(global.players, $roomId$, $playerId$, Object.keys($spots$), "updateSpots", $spots$);
     EventBus.publish("updatedSpots");
   }
@@ -318,7 +345,7 @@
                         avatar="{utils.getAttr($spots$, [pid, 'avatar'])}"
                         team="{utils.getAttr($spots$, [pid, 'team'])}"
                       />
-                      {#if utils.getAttr($spots$, [pid, 'gamen']) == $_gamen$}
+                      {#if utils.getAttr($spots$, [pid, 'gamen']) == global.state['gamen'] + 1}
                         <span class="text-xs inline-block bg-green-200 rounded-sm px-2 py-1 ml-2">ready</span>
                       {/if}
                     </li>

@@ -2,16 +2,14 @@
   import Splash from "./splash.svelte";
   import BuddyChessground from "../../components/BuddyChessground.svelte";
   import Sidebar from "../../components/Sidebar.svelte";
-  import Avatar from "../../components/Avatar/index.svelte";
-  import Piece from "../../components/Piece.svelte";
 
-  import { onMount, onDestroy, tick } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import { fade } from "svelte/transition";
   import { replace } from "svelte-spa-router";
 
   import { EventBusSingleton as EventBus } from "light-event-bus";
 
-  import { _roomId$, roomId$, _playerId$, playerId$, spots$, wizard$ } from "../../common/datastore";
+  import { _roomId$, roomId$, _playerId$, playerId$, spots$, _gamen$, gamen$, wizard$ } from "../../common/datastore";
   import {
     aFEN$,
     bFEN$,
@@ -88,7 +86,7 @@
     window.removeEventListener("resize", fitViewport);
   });
 
-  const colors: cgtypes.Color[] = global.state["gamen"] % 2 == 0 ? ["white", "black"] : ["black", "white"];
+  const colors: cgtypes.Color[] = $gamen$ % 2 == 0 ? ["white", "black"] : ["black", "white"];
   const spids = Object.keys($spots$).sort();
 
   const myTeam = spids.filter((pid) => $spots$[pid]["team"] == $spots$[$playerId$]["team"]);
@@ -108,16 +106,35 @@
   let bInteractive: cgtypes.Color | false = myColor;
   let aInteractive: cgtypes.Color | false = false;
 
-  const seating: any = {
-    b: {
-      [myColor]: myId,
-      [opColor]: opId,
-    },
-    a: {
-      [buddyColor]: buddyId,
-      [buddyOpColor]: buddyOpId,
-    },
-  };
+  const seating: any = utils.tree();
+  seating["b"][myColor]["id"] = myId;
+  seating["b"][myColor]["name"] = $spots$[myId]["name"];
+  seating["b"][myColor]["avatar"] = $spots$[myId]["avatar"];
+  seating["b"][myColor]["team"] = $spots$[myId]["team"];
+  seating["b"][opColor]["id"] = opId;
+  seating["b"][opColor]["name"] = $spots$[opId]["name"];
+  seating["b"][opColor]["avatar"] = $spots$[opId]["avatar"];
+  seating["b"][opColor]["team"] = $spots$[opId]["team"];
+  seating["a"][buddyColor]["id"] = buddyId;
+  seating["a"][buddyColor]["name"] = $spots$[buddyId]["name"];
+  seating["a"][buddyColor]["avatar"] = $spots$[buddyId]["avatar"];
+  seating["a"][buddyColor]["team"] = $spots$[buddyId]["team"];
+  seating["a"][buddyOpColor]["id"] = buddyOpId;
+  seating["a"][buddyOpColor]["name"] = $spots$[buddyOpId]["name"];
+  seating["a"][buddyOpColor]["avatar"] = $spots$[buddyOpId]["avatar"];
+  seating["a"][buddyOpColor]["team"] = $spots$[buddyOpId]["team"];
+  let aWhiteName: string = seating["a"]["white"]["name"];
+  let aWhiteAvatar: string = seating["a"]["white"]["avatar"];
+  let aWhiteTeam: string = seating["a"]["white"]["team"];
+  let aBlackName: string = seating["a"]["black"]["name"];
+  let aBlackAvatar: string = seating["a"]["black"]["avatar"];
+  let aBlackTeam: string = seating["a"]["black"]["team"];
+  let bWhiteName: string = seating["b"]["white"]["name"];
+  let bWhiteAvatar: string = seating["b"]["white"]["avatar"];
+  let bWhiteTeam: string = seating["b"]["white"]["team"];
+  let bBlackName: string = seating["b"]["black"]["name"];
+  let bBlackAvatar: string = seating["b"]["black"]["avatar"];
+  let bBlackTeam: string = seating["b"]["black"]["team"];
 
   // @ts-ignore
   let aChessground: Api = undefined;
@@ -159,11 +176,9 @@
 
   function subsconce() {
     EventBus.subscribe("updatedSpots", () => {
-      console.log(11, global.state["spots"], global.state["wizard"], global.state["gamen"]);
-
-      if (wizard.isIn(global.state["wizard"], wizard.steps.WAIT_FOR_GAME, "doing")) {
-        if (allSpotsInSync(global.state["spots"], global.state["wizard"], global.state["gamen"])) {
-          $wizard$ = global.state["wizard"] = wizard.next(global.state["wizard"]);
+      if (wizard.isIn($wizard$, wizard.steps.WAIT_FOR_GAME, "doing")) {
+        if (allSpotsInSync($spots$, $wizard$, $gamen$)) {
+          $wizard$ = wizard.next($wizard$);
           gameTime();
         }
       }
@@ -171,7 +186,7 @@
   }
 
   function preGame() {
-    $wizard$ = global.state["wizard"] = wizard.next($wizard$, subsconce);
+    $wizard$ = wizard.next($wizard$, subsconce);
 
     const initClockState = {
       waiting: false,
@@ -201,27 +216,18 @@
     $aFEN$ = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     $bFEN$ = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-    $wizard$ = global.state["wizard"] = wizard.next($wizard$);
+    $wizard$ = wizard.next($wizard$);
   }
 
   function waitForGame() {
-    $wizard$ = global.state["wizard"] = wizard.next($wizard$);
-
-    $spots$[$playerId$]["wizard"] = $wizard$;
-    $spots$[$playerId$]["gamen"] = global.state["gamen"];
-    $spots$ = $spots$;
-
-    if ($playerId$ == "host") {
-      msgbus.sendAll(global.players, $roomId$, $playerId$, Object.keys($spots$), "updateSpots", $spots$);
-      EventBus.publish("updatedSpots");
-    } else {
-      msgbus.send(global.players, $roomId$, $playerId$, "host", "updateSpot", { [$playerId$]: $spots$[$playerId$] });
-    }
+    $wizard$ = wizard.next($wizard$);
+    $spots$ = { ...$spots$, [$playerId$]: { ...$spots$[$playerId$], gamen: $gamen$, wizard: $wizard$ } };
+    msgbus.sendAll(global.players, $roomId$, $playerId$, Object.keys($spots$), "updateSpots", $spots$);
+    if ($playerId$ == "host") EventBus.publish("updatedSpots");
   }
 
   function gameTime() {
-    $wizard$ = global.state["wizard"] = wizard.next($wizard$);
-    console.log(22, global.state["spots"], global.state["wizard"], global.state["gamen"]);
+    $wizard$ = wizard.next($wizard$);
     visibleSplash = false;
   }
 </script>
@@ -258,26 +264,13 @@
 
 {#if visibleSplash}
   <div out:fade class="w-full h-full fixed flex left-0 bg-white items-center justify-center z-50">
-    <div class="flex flex-col">
-      <div class="flex w-64 h-16 items-center justify-center text-3xl">
-        {#if wizard.isBefore(utils.getAttr($spots$, [buddyOpId, 'wizard']), wizard.steps.WAIT_FOR_GAME, 'doing')}
-          <span class="w-full inline-block bg-gray-200 px-2 py-1 text-center">Ready?</span>
-        {:else}
-          <span in:fade class="w-full inline-block bg-green-200 px-2 py-1 text-center">Ready</span>
-        {/if}
-      </div>
-      <div class="flex w-64 h-16 items-center justify-center text-3xl bg-yellow-500">
-        {utils.getAttr($spots$, [buddyOpId, 'name'])}
-      </div>
+    <div class="flex flex-col" class:shaking="{aInteractive}">
       <div class="flex w-64 h-32">
-        <span
-          class="{global.teambg[utils.getAttr($spots$, [buddyOpId, 'team'])]} inline-block w-1/2 h-full border
-          border-gray-400"
-        >
-          <Avatar avatar="{utils.getAttr($spots$, [buddyOpId, 'avatar'])}" />
+        <span class="inline-block w-1/2 h-full bg-gray-200 border border-gray-400">
+          <Avatar avatar="{aTopAvatar}" />
         </span>
         <span class="inline-block w-1/2 h-full cg-square dark">
-          <Piece role="king" color="{buddyOpColor}" />
+          <Piece role="king" color="{aTopColor}" />
         </span>
       </div>
       <div class="flex w-64 h-32">
@@ -285,25 +278,15 @@
         <span class="inline-block w-1/2 h-full cg-square light"></span>
       </div>
       <div class="flex w-64 h-32">
-        <span
-          class="{global.teambg[utils.getAttr($spots$, [buddyId, 'team'])]} inline-block w-1/2 h-full border
-          border-gray-400"
-        >
-          <Avatar avatar="{utils.getAttr($spots$, [buddyId, 'avatar'])}" />
+        <span class="inline-block w-1/2 h-full bg-gray-200 border border-gray-400">
+          <Avatar avatar="{aBottomAvatar}" />
         </span>
         <span class="inline-block w-1/2 h-full cg-square dark">
-          <Piece role="king" color="{buddyColor}" />
+          <Piece role="king" color="{aBottomColor}" />
         </span>
       </div>
       <div class="flex w-64 h-16 items-center justify-center text-3xl bg-yellow-500">
-        {utils.getAttr($spots$, [buddyId, 'name'])}
-      </div>
-      <div class="flex w-64 h-16 items-center justify-center text-3xl">
-        {#if wizard.isBefore(utils.getAttr($spots$, [buddyId, 'wizard']), wizard.steps.WAIT_FOR_GAME, 'doing')}
-          <span class="w-full inline-block bg-gray-200 px-2 py-1 text-center">Ready?</span>
-        {:else}
-          <span in:fade class="w-full inline-block bg-green-200 px-2 py-1 text-center">Ready</span>
-        {/if}
+        {aInteractive ? 'You' : 'Your buddy'}
       </div>
     </div>
     <div class="flex flex-col">
@@ -312,26 +295,13 @@
       <div class="flex w-32 h-32 items-center justify-center text-4xl font-serif">&amp;</div>
       <div class="flex w-32 h-16 items-center justify-center font-serif"></div>
     </div>
-    <div class="flex flex-col shaking">
-      <div class="flex w-64 h-16 items-center justify-center text-3xl">
-        {#if wizard.isBefore(utils.getAttr($spots$, [opId, 'wizard']), wizard.steps.WAIT_FOR_GAME, 'doing')}
-          <span class="w-full inline-block bg-gray-200 px-2 py-1 text-center">Ready?</span>
-        {:else}
-          <span in:fade class="w-full inline-block bg-green-200 px-2 py-1 text-center">Ready</span>
-        {/if}
-      </div>
-      <div class="flex w-64 h-16 items-center justify-center text-3xl bg-yellow-500">
-        {utils.getAttr($spots$, [opId, 'name'])}
-      </div>
+    <div class="flex flex-col" class:shaking="{bInteractive}">
       <div class="flex w-64 h-32">
-        <span
-          class="{global.teambg[utils.getAttr($spots$, [opId, 'team'])]} inline-block w-1/2 h-full border
-          border-gray-400"
-        >
-          <Avatar avatar="{utils.getAttr($spots$, [opId, 'avatar'])}" />
+        <span class="inline-block w-1/2 h-full bg-gray-200 border border-gray-400">
+          <Avatar avatar="{bTopAvatar}" />
         </span>
         <span class="inline-block w-1/2 h-full cg-square dark">
-          <Piece role="king" color="{opColor}" />
+          <Piece role="king" color="{bTopColor}" />
         </span>
       </div>
       <div class="flex w-64 h-32">
@@ -339,30 +309,15 @@
         <span class="inline-block w-1/2 h-full cg-square light"></span>
       </div>
       <div class="flex w-64 h-32">
-        <span
-          class="{global.teambg[utils.getAttr($spots$, [myId, 'team'])]} inline-block w-1/2 h-full border
-          border-gray-400"
-        >
-          <Avatar avatar="{utils.getAttr($spots$, [myId, 'avatar'])}" />
+        <span class="inline-block w-1/2 h-full bg-gray-200 border border-gray-400">
+          <Avatar avatar="{bBottomAvatar}" />
         </span>
         <span class="inline-block w-1/2 h-full cg-square dark">
-          <Piece role="king" color="{myColor}" />
+          <Piece role="king" color="{bBottomColor}" />
         </span>
       </div>
       <div class="flex w-64 h-16 items-center justify-center text-3xl bg-yellow-500">
-        {utils.getAttr($spots$, [myId, 'name'])}
-      </div>
-      <div class="flex w-64 h-16 items-center justify-center text-3xl">
-        {#if wizard.isBefore(utils.getAttr($spots$, [myId, 'wizard']), wizard.steps.WAIT_FOR_GAME, 'doing')}
-          <button
-            class="w-full bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 focus:outline-none rounded-lg"
-            on:click="{waitForGame}"
-          >
-            Ready?
-          </button>
-        {:else}
-          <span in:fade class="w-full inline-block bg-green-200 px-2 py-1 text-center">Ready</span>
-        {/if}
+        {bInteractive ? 'You' : 'Your buddy'}
       </div>
     </div>
   </div>
@@ -374,19 +329,19 @@
       bind:aChessground
       {aChessgroundConfig}
       {aInteractive}
-      aWhiteAvatar="{utils.getAttr($spots$, [seating['a']['white'], 'avatar'])}"
+      {aWhiteAvatar}
       aWhiteClock="{$aWhiteClock$}"
       aWhiteSpares="{$aWhiteSpares$}"
-      aBlackAvatar="{utils.getAttr($spots$, [seating['a']['black'], 'avatar'])}"
+      {aBlackAvatar}
       aBlackClock="{$aBlackClock$}"
       aBlackSpares="{$aBlackSpares$}"
       bind:bChessground
       {bChessgroundConfig}
       {bInteractive}
-      bWhiteAvatar="{utils.getAttr($spots$, [seating['b']['white'], 'avatar'])}"
+      {bWhiteAvatar}
       bWhiteClock="{$bWhiteClock$}"
       bWhiteSpares="{$bWhiteSpares$}"
-      bBlackAvatar="{utils.getAttr($spots$, [seating['b']['black'], 'avatar'])}"
+      {bBlackAvatar}
       bBlackClock="{$bBlackClock$}"
       bBlackSpares="{$bBlackSpares$}"
     />

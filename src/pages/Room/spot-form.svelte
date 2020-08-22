@@ -53,7 +53,7 @@
       <div class="flex-grow">
         <div class="w-full h-full flex items-center justify-center">
           <div class="w-20 h-20 mt-4 p-2 {team == 'red' ? 'bg-red-300' : ''} {team == 'blue' ? 'bg-blue-300' : ''}">
-            <Avatar icon="{avatar}" />
+            <Avatar {avatar} />
           </div>
         </div>
       </div>

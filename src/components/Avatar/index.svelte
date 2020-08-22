@@ -1,5 +1,5 @@
 <script lang="typescript">
-  export let icon: string; //"elephant" | "giraffe" | "monkey" | "rabbit"
+  export let avatar: string; //"elephant" | "giraffe" | "monkey" | "rabbit"
 </script>
 
 <style>
@@ -20,4 +20,4 @@
   }
 </style>
 
-<span class="h-full w-full bg-cover inline-block {icon}"></span>
+<span class="h-full w-full bg-cover inline-block {avatar}"></span>

@@ -15,10 +15,10 @@
   let bottomColor: cgtypes.Color;
   $: bottomColor = chessgroundConfig.orientation === "white" ? "white" : "black";
 
-  export let interactiveColor: cgtypes.Color | false;
+  export let interactive: cgtypes.Color | false;
 
-  export let whiteIcon: string;
-  export let blackIcon: string;
+  export let whiteAvatar: string;
+  export let blackAvatar: string;
 
   export let whiteClock: {
     waiting: boolean;
@@ -51,7 +51,7 @@
   function spareDragNewPiece(e: Event) {
     const data = (e as CustomEvent).detail;
     if (data.pieceCount < 1) return;
-    if (interactiveColor !== data.pieceColor) return;
+    if (interactive !== data.pieceColor) return;
     const piece = { role: data.pieceRole, color: data.pieceColor };
     const event = data.event;
     chessground.dragNewPiece(piece, event);
@@ -62,7 +62,7 @@
   {#if topColor == 'white'}
     <Meta
       color="white"
-      icon="{whiteIcon}"
+      avatar="{whiteAvatar}"
       clock="{whiteClock}"
       spares="{whiteSpares}"
       on:spareDragNewPiece="{spareDragNewPiece}"
@@ -70,7 +70,7 @@
   {:else}
     <Meta
       color="black"
-      icon="{blackIcon}"
+      avatar="{blackAvatar}"
       clock="{blackClock}"
       spares="{blackSpares}"
       on:spareDragNewPiece="{spareDragNewPiece}"
@@ -80,7 +80,7 @@
   {#if bottomColor == 'white'}
     <Meta
       color="white"
-      icon="{whiteIcon}"
+      avatar="{whiteAvatar}"
       clock="{whiteClock}"
       spares="{whiteSpares}"
       on:spareDragNewPiece="{spareDragNewPiece}"
@@ -88,7 +88,7 @@
   {:else}
     <Meta
       color="black"
-      icon="{blackIcon}"
+      avatar="{blackAvatar}"
       clock="{blackClock}"
       spares="{blackSpares}"
       on:spareDragNewPiece="{spareDragNewPiece}"

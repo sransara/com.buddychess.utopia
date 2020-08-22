@@ -7,7 +7,11 @@ export function sleep(ms: number) {
 }
 
 export function getAttr(obj: any, path: string[]) {
-  return path.reduce((acc, cur) => acc[cur], obj);
+  try {
+    return path.reduce((acc, cur) => acc[cur], obj);
+  } catch {
+    return "";
+  }
 }
 
 export class DefaultDict {
@@ -28,4 +32,20 @@ export class DefaultDict {
       }
     );
   }
+}
+
+export function tree(): any {
+  return new Proxy(
+    {},
+    {
+      get: (target, name) => {
+        if (name in target) {
+          return (target as any)[name];
+        } else {
+          (target as any)[name] = tree();
+          return (target as any)[name];
+        }
+      },
+    }
+  );
 }

@@ -161,7 +161,7 @@ export function setupPeerConnection(players: any, roomId: string, myId: string, 
   });
 }
 
-export function allSpotsInSync(spots: any, wizard: wizard.types.wizard, gamen: number) {
+export function allSpotsInSync(spots: any, wiz: wizard.types.wizard, gamen: number) {
   const pids = Object.keys(spots);
   if (pids.length < 4) {
     return false;
@@ -173,7 +173,7 @@ export function allSpotsInSync(spots: any, wizard: wizard.types.wizard, gamen: n
   }
 
   const wizards = pids.map((pid) => spots[pid]["wizard"]);
-  if (!wizards.every((v) => v === wizard)) {
+  if (!wizards.every((v) => wizard.equals(v, wiz))) {
     return false;
   }
 

@@ -8,7 +8,7 @@
   import Avatar from "../Avatar/index.svelte";
   import Clock from "./clock.svelte";
 
-  export let icon: string;
+  export let avatar: string;
   export let clock: {
     waiting: boolean;
     minutes: number;
@@ -28,7 +28,7 @@
   <div class="absolute table bottom-0 w-1/8 pb-1/8">
     <div class="absolute h-full bottom-0 flex flex-row" style="width: 800%;">
       <div class="bg-gray-200 border border-gray-400 inline-block w-1/8 cursor-default">
-        <Avatar {icon} />
+        <Avatar {avatar} />
       </div>
       <div class="inline-block w-1/4 cursor-default">
         <Clock waiting="{clock.waiting}" minutes="{clock.minutes}" seconds="{clock.seconds}" />

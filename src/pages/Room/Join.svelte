@@ -11,11 +11,12 @@
   import { myPublicKey, mySecretKey } from "../../common/crypto";
   import { dbrest } from "../../common/firebase";
   import { initPeerKey, setupPeerConnection, allSpotsInSync } from "./common";
-  import { _roomId$, roomId$, _playerId$, playerId$, spots$, _gamen$, gamen$, wizard$ } from "../../common/datastore";
+  import { _roomId$, roomId$, _playerId$, playerId$, spots$, wizard$ } from "../../common/datastore";
   import * as global from "../../common/dataglobal";
   import * as msgbus from "../../common/msgbus";
   import * as wizard from "../../common/wizard";
   import * as utils from "../../common/utils";
+  import { tick } from "svelte";
 
   export let params: any = {};
 
@@ -37,7 +38,7 @@
 
   async function joinRoomQueue() {
     try {
-      $wizard$ = wizard.next($wizard$);
+      $wizard$ = global.state["wizard"] = wizard.next($wizard$);
       $_playerId$ = "12345";
       $_roomId$ = params.id;
 
@@ -68,47 +69,10 @@
 
       $playerId$ = $_playerId$;
       $roomId$ = $_roomId$;
-      $wizard$ = wizard.next($wizard$);
+      $wizard$ = global.state["wizard"] = wizard.next($wizard$);
     } catch (err) {
       console.log(err);
     }
-  }
-
-  function subsconce() {
-    EventBus.subscribe("deletePlayer", (pid: any) => {
-      if (pid == "host") {
-        alert("Disconnected from the host!");
-        window.location.reload();
-      }
-    });
-
-    EventBus.subscribe("initPeerConnection", async (arg: any) => {
-      const peerId = arg.from;
-      if ("peerConnection" in global.players[peerId]) return;
-      await setupPeerConnection(global.players, $roomId$, $playerId$, peerId);
-    });
-
-    EventBus.subscribe("updatedSpots", async () => {
-      if (wizard.isIn($wizard$, wizard.steps.WAIT_FOR_SPOTS, "doing")) {
-        if (allSpotsInSync($spots$, $wizard$, $_gamen$)) {
-          $wizard$ = wizard.next($wizard$);
-          await utils.sleep(5000);
-          replace(`game/join/${$roomId$}`);
-        }
-      }
-    });
-
-    EventBus.subscribe("updateSpots", async (arg: any) => {
-      $spots$ = arg.payload;
-      Object.keys($spots$).forEach(async (peerId) => {
-        if (peerId == $playerId$) return;
-        if ($playerId$ < peerId) return;
-        // only non-polite will initiate connection
-        if ("peerConnection" in global.players[peerId]) return;
-        await setupPeerConnection(global.players, $roomId$, $playerId$, peerId);
-      });
-      EventBus.publish("updatedSpots");
-    });
   }
 
   let _spotName: string = "";
@@ -117,7 +81,9 @@
   let _spotErrors: string[] = [];
 
   async function markYourSpot() {
-    $wizard$ = wizard.next($wizard$, subsconce);
+    $wizard$ = global.state["wizard"] = wizard.next($wizard$);
+
+    msgbus.firestoreUnsubscribe();
 
     _spotErrors = [];
     if (!_spotName) {
@@ -130,7 +96,7 @@
       _spotErrors = ["Team is required.", ..._spotErrors];
     }
     if (_spotErrors.length) {
-      $wizard$ = wizard.back($wizard$);
+      $wizard$ = global.state["wizard"] = wizard.back($wizard$);
       return;
     }
 
@@ -148,23 +114,70 @@
       });
     });
     _spotErrors = response["errors"];
-    $gamen$ = response["gamen"];
-    $spots$ = response["spots"];
+    global.state["gamen"] = response["gamen"];
+    $spots$ = global.state["spots"] = response["spots"];
 
     if (_spotErrors.length) {
-      $wizard$ = wizard.back($wizard$);
+      $wizard$ = global.state["wizard"] = wizard.back($wizard$);
       return;
     }
 
-    $wizard$ = wizard.next($wizard$);
+    $wizard$ = global.state["wizard"] = wizard.next($wizard$, subsconce);
     waitForSpots();
+  }
+
+  function subsconce() {
+    EventBus.subscribe("deletePlayer", (pid: any) => {
+      if (pid == "host") {
+        alert("Disconnected from the host!");
+        replace(`/game/join/${$roomId$}`);
+        window.location.reload();
+      }
+    });
+
+    EventBus.subscribe("initPeerConnection", async (arg: any) => {
+      const peerId = arg.from;
+      if ("peerConnection" in global.players[peerId]) return;
+      await setupPeerConnection(global.players, $roomId$, $playerId$, peerId);
+    });
+
+    EventBus.subscribe("updatedSpots", () => {
+      if (wizard.isIn(global.state["wizard"], wizard.steps.WAIT_FOR_SPOTS, "doing")) {
+        if (allSpotsInSync(global.state["spots"], global.state["wizard"], global.state["gamen"] + 1)) {
+          $wizard$ = global.state["wizard"] = wizard.next(global.state["wizard"]);
+          global.state["gamen"] = global.state["gamen"] + 1;
+          replace(`/game/join/${$roomId$}`);
+        }
+      } else if (wizard.isAfter(global.state["wizard"], wizard.steps.WAIT_FOR_SPOTS)) {
+        if (Object.keys(global.state["spots"]).length != 4) {
+          $wizard$ = global.state["wizard"] = wizard.todo(wizard.steps.WAIT_FOR_SPOTS);
+          replace(`/room/join/${$roomId$}`);
+        }
+      }
+    });
+
+    EventBus.subscribe("updateSpots", async (arg: any) => {
+      $spots$ = global.state["spots"] = arg.payload;
+      await tick();
+      Object.keys($spots$).forEach(async (peerId) => {
+        if (peerId == $playerId$) return;
+        if ($playerId$ < peerId) return;
+        // only non-polite will initiate connection
+        if ("peerConnection" in global.players[peerId]) return;
+        await setupPeerConnection(global.players, $roomId$, $playerId$, peerId);
+      });
+      EventBus.publish("updatedSpots");
+    });
   }
 
   if (wizard.isIn($wizard$, wizard.steps.WAIT_FOR_SPOTS, "todo")) waitForSpots();
   function waitForSpots() {
-    $wizard$ = wizard.next($wizard$);
-    $_gamen$ = $gamen$ + 1;
-    $spots$ = { ...$spots$, [$playerId$]: { ...$spots$[$playerId$], gamen: $_gamen$ } };
+    $wizard$ = global.state["wizard"] = wizard.next($wizard$);
+
+    $spots$[$playerId$]["wizard"] = $wizard$;
+    $spots$[$playerId$]["gamen"] = global.state["gamen"] + 1;
+    $spots$ = global.state["spots"] = $spots$;
+
     msgbus.send(global.players, $roomId$, $playerId$, "host", "updateSpot", { [$playerId$]: $spots$[$playerId$] });
   }
 </script>
@@ -330,7 +343,7 @@
                         avatar="{utils.getAttr($spots$, [pid, 'avatar'])}"
                         team="{utils.getAttr($spots$, [pid, 'team'])}"
                       />
-                      {#if utils.getAttr($spots$, [pid, 'gamen']) == $_gamen$}
+                      {#if utils.getAttr($spots$, [pid, 'gamen']) == global.state['gamen'] + 1}
                         <span class="text-xs inline-block bg-green-200 rounded-sm px-2 py-1 ml-2">ready</span>
                       {/if}
                     </li>
