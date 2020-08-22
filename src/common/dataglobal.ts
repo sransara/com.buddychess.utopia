@@ -10,5 +10,3 @@ export const teambg: any = {
 };
 
 export const players: any = new DefaultDict(Object);
-
-export const state: any = {};

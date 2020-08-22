@@ -25,25 +25,15 @@ function neww(wizard: types.wizard | {}, stepn: number | undefined, status: type
   return { ...wizard, ...mods };
 }
 
-let doOnce: any = {};
-export function next(wizard: types.wizard, fn?: () => void): types.wizard {
+export function next(wizard: types.wizard): types.wizard {
   let stepn = wizard["stepn"];
   let status = wizard["status"];
 
-  let newWiz;
   if (status == "todo") {
-    newWiz = neww(wizard, undefined, "doing");
-  } else {
-    // if (currStatus == "doing")
-    newWiz = neww(wizard, stepn + 1, "todo");
+    return neww(wizard, undefined, "doing");
   }
-  if (fn) {
-    let key = [newWiz["stepn"], newWiz["status"]].join("_");
-    if (key in doOnce === false) fn();
-
-    doOnce[key] = true;
-  }
-  return newWiz;
+  // else if (currStatus == "doing")
+  return neww(wizard, stepn + 1, "todo");
 }
 
 export function back(wizard: types.wizard): types.wizard {

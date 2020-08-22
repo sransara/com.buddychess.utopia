@@ -5,13 +5,13 @@
   import Avatar from "../../components/Avatar/index.svelte";
   import Piece from "../../components/Piece.svelte";
 
-  import { onMount, onDestroy, tick } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import { fade } from "svelte/transition";
   import { replace } from "svelte-spa-router";
 
   import { EventBusSingleton as EventBus } from "light-event-bus";
 
-  import { _roomId$, roomId$, _playerId$, playerId$, spots$, wizard$ } from "../../common/datastore";
+  import { _roomId$, roomId$, _playerId$, playerId$, spots$, wizard$, gamen$ } from "../../common/datastore";
   import {
     aFEN$,
     bFEN$,
@@ -78,7 +78,7 @@
   onMount(async () => {
     document.body.style.overflow = "hidden";
     window.addEventListener("resize", fitViewport);
-    await utils.sleep(1000);
+    await utils.sleep(500);
     fitViewport();
     if (wizard.isAfter($wizard$, wizard.steps.WAIT_FOR_GAME)) visibleSplash = false;
   });
@@ -88,7 +88,7 @@
     window.removeEventListener("resize", fitViewport);
   });
 
-  const colors: cgtypes.Color[] = global.state["gamen"] % 2 == 0 ? ["white", "black"] : ["black", "white"];
+  const colors: cgtypes.Color[] = $gamen$ % 2 == 0 ? ["white", "black"] : ["black", "white"];
   const spids = Object.keys($spots$).sort();
 
   const myTeam = spids.filter((pid) => $spots$[pid]["team"] == $spots$[$playerId$]["team"]);
@@ -157,21 +157,8 @@
     chessx.loadChessgroundStateFromChess(bChessground, myChess);
   });
 
-  function subsconce() {
-    EventBus.subscribe("updatedSpots", () => {
-      console.log(11, global.state["spots"], global.state["wizard"], global.state["gamen"]);
-
-      if (wizard.isIn(global.state["wizard"], wizard.steps.WAIT_FOR_GAME, "doing")) {
-        if (allSpotsInSync(global.state["spots"], global.state["wizard"], global.state["gamen"])) {
-          $wizard$ = global.state["wizard"] = wizard.next(global.state["wizard"]);
-          gameTime();
-        }
-      }
-    });
-  }
-
   function preGame() {
-    $wizard$ = global.state["wizard"] = wizard.next($wizard$, subsconce);
+    $wizard$ = wizard.next($wizard$);
 
     const initClockState = {
       waiting: false,
@@ -201,14 +188,14 @@
     $aFEN$ = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     $bFEN$ = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-    $wizard$ = global.state["wizard"] = wizard.next($wizard$);
+    $wizard$ = wizard.next($wizard$);
   }
 
   function waitForGame() {
-    $wizard$ = global.state["wizard"] = wizard.next($wizard$);
+    $wizard$ = wizard.next($wizard$);
 
     $spots$[$playerId$]["wizard"] = $wizard$;
-    $spots$[$playerId$]["gamen"] = global.state["gamen"];
+    $spots$[$playerId$]["gamen"] = $gamen$;
     $spots$ = $spots$;
 
     if ($playerId$ == "host") {
@@ -219,9 +206,9 @@
     }
   }
 
+  $: if (wizard.isIn($wizard$, wizard.steps.GAME_TIME, "todo")) gameTime();
   function gameTime() {
-    $wizard$ = global.state["wizard"] = wizard.next($wizard$);
-    console.log(22, global.state["spots"], global.state["wizard"], global.state["gamen"]);
+    $wizard$ = wizard.next($wizard$);
     visibleSplash = false;
   }
 </script>
@@ -298,6 +285,7 @@
       <div class="flex w-64 h-16 items-center justify-center text-3xl bg-yellow-500">
         {utils.getAttr($spots$, [buddyId, 'name'])}
       </div>
+      <div class="flex w-64 h-6 items-center justify-center text-xl bg-yellow-500">Your buddy</div>
       <div class="flex w-64 h-16 items-center justify-center text-3xl">
         {#if wizard.isBefore(utils.getAttr($spots$, [buddyId, 'wizard']), wizard.steps.WAIT_FOR_GAME, 'doing')}
           <span class="w-full inline-block bg-gray-200 px-2 py-1 text-center">Ready?</span>
@@ -352,6 +340,7 @@
       <div class="flex w-64 h-16 items-center justify-center text-3xl bg-yellow-500">
         {utils.getAttr($spots$, [myId, 'name'])}
       </div>
+      <div class="flex w-64 h-6 items-center justify-center text-xl bg-yellow-500">You</div>
       <div class="flex w-64 h-16 items-center justify-center text-3xl">
         {#if wizard.isBefore(utils.getAttr($spots$, [myId, 'wizard']), wizard.steps.WAIT_FOR_GAME, 'doing')}
           <button
@@ -374,19 +363,27 @@
       bind:aChessground
       {aChessgroundConfig}
       {aInteractive}
+      aWhiteName="{utils.getAttr($spots$, [seating['a']['white'], 'name'])}"
       aWhiteAvatar="{utils.getAttr($spots$, [seating['a']['white'], 'avatar'])}"
+      aWhiteTeam="{utils.getAttr($spots$, [seating['a']['white'], 'team'])}"
       aWhiteClock="{$aWhiteClock$}"
       aWhiteSpares="{$aWhiteSpares$}"
+      aBlackName="{utils.getAttr($spots$, [seating['a']['black'], 'name'])}"
       aBlackAvatar="{utils.getAttr($spots$, [seating['a']['black'], 'avatar'])}"
+      aBlackTeam="{utils.getAttr($spots$, [seating['a']['black'], 'team'])}"
       aBlackClock="{$aBlackClock$}"
       aBlackSpares="{$aBlackSpares$}"
       bind:bChessground
       {bChessgroundConfig}
       {bInteractive}
+      bWhiteName="{utils.getAttr($spots$, [seating['b']['white'], 'name'])}"
       bWhiteAvatar="{utils.getAttr($spots$, [seating['b']['white'], 'avatar'])}"
+      bWhiteTeam="{utils.getAttr($spots$, [seating['b']['white'], 'team'])}"
       bWhiteClock="{$bWhiteClock$}"
       bWhiteSpares="{$bWhiteSpares$}"
+      bBlackName="{utils.getAttr($spots$, [seating['b']['black'], 'name'])}"
       bBlackAvatar="{utils.getAttr($spots$, [seating['b']['black'], 'avatar'])}"
+      bBlackTeam="{utils.getAttr($spots$, [seating['b']['black'], 'team'])}"
       bBlackClock="{$bBlackClock$}"
       bBlackSpares="{$bBlackSpares$}"
     />
