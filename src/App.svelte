@@ -162,7 +162,7 @@
       }
     });
 
-    EventBus.subscribe("madeMove", (arg: any) => {
+    EventBus.subscribe("afterMove", (arg: any) => {
       const move = arg.payload;
       if (move.fromId == $crazy$[$playerId$]["opId"]) {
         $bcg$["fen"] = move["fen"];
@@ -173,9 +173,42 @@
         $acg$["lastMove"] = move["lastMove"];
         $acg$ = $acg$;
       }
-      $crazy$[move.fromId]["spares"] = move["spares"];
+
+      if (move.spare) $crazy$[$crazy$[move.fromId]["buddyId"]]["spares"][move.spare] += 1;
+
+      $crazy$[move.fromId]["spares"]["dropType"] = undefined;
+      $crazy$[move.fromId]["spares"]["dropRole"] = undefined;
+      $crazy$[$crazy$[move.fromId]["opId"]]["spares"]["dropType"] = undefined;
+      $crazy$[$crazy$[move.fromId]["opId"]]["spares"]["dropRole"] = undefined;
+
       $crazy$[move.fromId]["clock"] = move["clock"];
       $crazy$[$crazy$[move.fromId]["opId"]]["clock"]["state"] = "active";
+
+      $crazy$ = $crazy$;
+    });
+
+    EventBus.subscribe("afterNewPieceMove", (arg: any) => {
+      const move = arg.payload;
+      if (move.fromId == $crazy$[$playerId$]["opId"]) {
+        $bcg$["fen"] = move["fen"];
+        $bcg$["lastMove"] = move["lastMove"];
+        $bcg$ = $bcg$;
+      } else {
+        $acg$["fen"] = move["fen"];
+        $acg$["lastMove"] = move["lastMove"];
+        $acg$ = $acg$;
+      }
+
+      if (move.spare) $crazy$[move.fromId]["spares"][move.spare] -= 1;
+
+      $crazy$[move.fromId]["spares"]["dropType"] = "drop";
+      $crazy$[move.fromId]["spares"]["dropRole"] = move.spare;
+      $crazy$[$crazy$[move.fromId]["opId"]]["spares"]["dropType"] = undefined;
+      $crazy$[$crazy$[move.fromId]["opId"]]["spares"]["dropRole"] = undefined;
+
+      $crazy$[move.fromId]["clock"] = move["clock"];
+      $crazy$[$crazy$[move.fromId]["opId"]]["clock"]["state"] = "active";
+
       $crazy$ = $crazy$;
     });
   });

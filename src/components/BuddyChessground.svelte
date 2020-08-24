@@ -10,7 +10,7 @@
   type ClockState = { state: string; minutes: number; seconds: number };
   type SpareState = {
     dropType: "predrop" | "drop" | undefined;
-    dropPiece: cgtypes.Role | undefined;
+    dropRole: cgtypes.Role | undefined;
     pawn: number;
     knight: number;
     bishop: number;

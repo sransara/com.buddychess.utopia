@@ -8,7 +8,7 @@
 
   export let color: cgtypes.Color;
   export let dropType: "predrop" | "drop" | undefined;
-  export let dropPiece: cgtypes.Role | undefined;
+  export let dropRole: cgtypes.Role | undefined;
   export let pawn: number;
   export let knight: number;
   export let bishop: number;
@@ -70,8 +70,8 @@
 
 <span
   class="h-full w-1/5 inline-block relative"
-  class:drop="{dropType == 'drop' && dropPiece == 'pawn'}"
-  class:predrop="{dropType == 'predrop' && dropPiece == 'pawn'}"
+  class:drop="{dropType == 'drop' && dropRole == 'pawn'}"
+  class:predrop="{dropType == 'predrop' && dropRole == 'pawn'}"
   data-role="pawn"
   data-color="{color}"
   data-count="{pawn}"
@@ -83,8 +83,8 @@
 
 <span
   class="h-full w-1/5 inline-block relative"
-  class:drop="{dropType == 'drop' && dropPiece == 'knight'}"
-  class:predrop="{dropType == 'predrop' && dropPiece == 'knight'}"
+  class:drop="{dropType == 'drop' && dropRole == 'knight'}"
+  class:predrop="{dropType == 'predrop' && dropRole == 'knight'}"
   data-role="knight"
   data-color="{color}"
   data-count="{knight}"
@@ -96,8 +96,8 @@
 
 <span
   class="h-full w-1/5 inline-block relative"
-  class:drop="{dropType == 'drop' && dropPiece == 'bishop'}"
-  class:predrop="{dropType == 'predrop' && dropPiece == 'bishop'}"
+  class:drop="{dropType == 'drop' && dropRole == 'bishop'}"
+  class:predrop="{dropType == 'predrop' && dropRole == 'bishop'}"
   data-role="bishop"
   data-color="{color}"
   data-count="{bishop}"
@@ -109,8 +109,8 @@
 
 <span
   class="h-full w-1/5 inline-block relative"
-  class:drop="{dropType == 'drop' && dropPiece == 'rook'}"
-  class:predrop="{dropType == 'predrop' && dropPiece == 'rook'}"
+  class:drop="{dropType == 'drop' && dropRole == 'rook'}"
+  class:predrop="{dropType == 'predrop' && dropRole == 'rook'}"
   data-role="rook"
   data-color="{color}"
   data-count="{rook}"
@@ -122,8 +122,8 @@
 
 <span
   class="h-full w-1/5 inline-block relative"
-  class:drop="{dropType == 'drop' && dropPiece == 'queen'}"
-  class:predrop="{dropType == 'predrop' && dropPiece == 'queen'}"
+  class:drop="{dropType == 'drop' && dropRole == 'queen'}"
+  class:predrop="{dropType == 'predrop' && dropRole == 'queen'}"
   data-role="queen"
   data-color="{color}"
   data-count="{queen}"

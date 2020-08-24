@@ -35,7 +35,7 @@
   import * as chtypes from "chess.js";
 
   export let params: any = {};
-  /*
+
   $: if (wizard.isAfter($wizard$, wizard.steps.WAIT_FOR_SPOTS)) {
     if ($playerId$ == "host") {
       if (params.action != "create" || params.id != $roomId$) {
@@ -53,35 +53,7 @@
   } else {
     replace("/");
   }
-*/
-  /*
-  $playerId$ = "-MFQapDzY2Vr8wl6k9B-";
-  //$playerId$ = "host";
-  $spots$ = {
-    host: { name: "xvcas", avatar: "elephant", team: "red", wizard: { stepn: 5, status: "doing" }, gamen: 1 },
-    "-MFQajB8AV5lg-aV2g5r": {
-      name: "e5ur",
-      avatar: "monkey",
-      team: "blue",
-      wizard: { stepn: 5, status: "doing" },
-      gamen: 1,
-    },
-    "-MFQamYtF9tvktXmij9K": {
-      name: "24y24",
-      avatar: "rabbit",
-      team: "blue",
-      wizard: { stepn: 5, status: "doing" },
-      gamen: 1,
-    },
-    "-MFQapDzY2Vr8wl6k9B-": {
-      name: "46yew",
-      avatar: "giraffe",
-      team: "red",
-      wizard: { stepn: 5, status: "doing" },
-      gamen: 1,
-    },
-  };
-*/
+
   // just a hacky way to fit the game view to window sizes
   // - resize game view to fill window height
   // - but make sure not to overflow on the x-axis
@@ -169,10 +141,10 @@
       showGhost: true,
     },
     premovable: {
-      enabled: true,
+      enabled: false,
     },
     predroppable: {
-      enabled: true,
+      enabled: false,
     },
   };
 
@@ -184,7 +156,7 @@
 
   const initSparesState = () => ({
     dropType: undefined,
-    dropPiece: undefined,
+    dropRole: undefined,
     pawn: 0,
     knight: 0,
     bishop: 0,
@@ -293,18 +265,18 @@
     });
   }
 
-  $: {
-    if (aChessground) {
-      loadState(aChessground, aChess, $acg$);
-    }
-
-    if (bChessground) {
-      loadState(bChessground, bChess, $bcg$);
-      if ([myId, opId].find((pid) => $crazy$[pid]["clock"]["state"] == "timeout")) {
-        bChessground.stop();
-      }
-    }
+  $: if (aChessground) {
+    loadState(aChessground, aChess, $acg$);
   }
+
+  $: if (bChessground) {
+    loadState(bChessground, bChess, $bcg$);
+  }
+
+  $: if (bChessground && [myId, opId].find((pid) => $crazy$[pid]["clock"]["state"] == "timeout")) {
+    bChessground.stop();
+  }
+
   function initChessground() {
     bChessground.set({
       movable: {
@@ -316,20 +288,58 @@
               return;
             }
 
-            if (metadata.captured) $crazy$[myId]["spares"][metadata.captured.role] += 1;
-            $crazy$[myId]["clock"]["state"] = "stopped";
-            $crazy$[opId]["clock"]["state"] = "waiting";
-            $crazy$ = $crazy$;
-
             $bcg$["fen"] = newFEN;
             $bcg$["lastMove"] = [orig as chtypes.Square, dest as chtypes.Square];
             $bcg$ = $bcg$;
 
-            msgbus.send(global.players, $roomId$, $playerId$, opId, "madeMove", {
+            if (metadata.captured) $crazy$[buddyId]["spares"][metadata.captured.role] += 1;
+
+            $crazy$[myId]["spares"]["dropType"] = undefined;
+            $crazy$[myId]["spares"]["dropRole"] = undefined;
+            $crazy$[opId]["spares"]["dropType"] = undefined;
+            $crazy$[opId]["spares"]["dropRole"] = undefined;
+
+            $crazy$[myId]["clock"]["state"] = "stopped";
+            $crazy$[opId]["clock"]["state"] = "active";
+
+            $crazy$ = $crazy$;
+
+            msgbus.sendAll(global.players, $roomId$, $playerId$, Object.keys($spots$), "afterMove", {
               fromId: myId,
               fen: newFEN,
               lastMove: [orig, dest],
-              spares: $crazy$[myId]["spares"],
+              spare: metadata.captured ? metadata.captured.role : undefined,
+              clock: $crazy$[myId]["clock"],
+            });
+          },
+          afterNewPiece: (role: cgtypes.Role, dest: cgtypes.Key, metadata: cgtypes.MoveMetadata) => {
+            const color = bChess.turn() == "w" ? "white" : "black";
+            const newFEN = chessx.put(bChess, { role: role, color: color }, dest);
+            if (!newFEN) {
+              loadState(bChessground, bChess, $bcg$);
+              return;
+            }
+
+            $bcg$["fen"] = newFEN;
+            $bcg$["lastMove"] = [dest as chtypes.Square];
+            $bcg$ = $bcg$;
+
+            $crazy$[myId]["spares"]["dropType"] = "drop";
+            $crazy$[myId]["spares"]["dropRole"] = role;
+            $crazy$[opId]["spares"]["dropType"] = undefined;
+            $crazy$[opId]["spares"]["dropRole"] = undefined;
+
+            $crazy$[myId]["spares"][role] -= 1;
+            $crazy$[myId]["clock"]["state"] = "stopped";
+            $crazy$[opId]["clock"]["state"] = "waiting";
+
+            $crazy$ = $crazy$;
+
+            msgbus.sendAll(global.players, $roomId$, $playerId$, Object.keys($spots$), "afterNewPieceMove", {
+              fromId: myId,
+              fen: newFEN,
+              lastMove: [dest],
+              spare: role,
               clock: $crazy$[myId]["clock"],
             });
           },

@@ -44,7 +44,7 @@
           on:dragNewPiece="{(e) => forward('spareDragNewPiece', e)}"
           {color}
           dropType="{spares.dropType}"
-          dropPiece="{spares.dropPiece}"
+          dropRole="{spares.dropRole}"
           pawn="{spares.pawn}"
           knight="{spares.knight}"
           bishop="{spares.bishop}"
