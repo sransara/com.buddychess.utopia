@@ -6,12 +6,12 @@ export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export function getAttr(obj: any, path: string[]) {
-  try {
-    return path.reduce((acc, cur) => acc[cur], obj);
-  } catch {
-    return "";
-  }
+export function getAttr(obj: any, path: string[], defaultInit?: any) {
+  return path.reduce((acc, cur) => {
+    if (acc && cur in acc) return acc[cur];
+    else if (defaultInit) return defaultInit();
+    else return undefined;
+  }, obj);
 }
 
 export class DefaultDict {
@@ -48,4 +48,37 @@ export function tree(): any {
       },
     }
   );
+}
+
+export class IntervalTimer {
+  fn: () => void;
+  time: number;
+  timer: number | undefined;
+
+  constructor(fn: () => void, time: number) {
+    this.fn = fn;
+    this.time = time;
+    this.timer = setInterval(fn, time);
+  }
+
+  stop() {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = undefined;
+    }
+    return this;
+  }
+
+  start() {
+    if (!this.timer) {
+      this.stop();
+      this.timer = setInterval(this.fn, this.time);
+    }
+    return this;
+  }
+
+  reset(newTime = this.time) {
+    this.time = newTime;
+    return this.stop().start();
+  }
 }

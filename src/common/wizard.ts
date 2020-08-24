@@ -55,6 +55,10 @@ export function doing(stepn: number) {
   return neww({}, stepn, "doing");
 }
 
+export function reset() {
+  return todo(steps.CREATE_OR_JOIN_ROOM_SPACE);
+}
+
 export function isIn(wizard: types.wizard, stepn: number, status?: types.status) {
   return wizard["stepn"] == stepn && (!status || wizard["status"] == status);
 }

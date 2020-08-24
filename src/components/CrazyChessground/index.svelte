@@ -15,37 +15,41 @@
   let bottomColor: cgtypes.Color;
   $: bottomColor = chessgroundConfig.orientation === "white" ? "white" : "black";
 
+  export let whiteName: string;
+  export let whiteAvatar: string;
+  export let whiteTeam: string;
+  export let blackName: string;
+  export let blackAvatar: string;
+  export let blackTeam: string;
+
   export let interactive: cgtypes.Color | false;
 
-  export let whiteAvatar: string;
-  export let blackAvatar: string;
-
   export let whiteClock: {
-    waiting: boolean;
+    state: string;
     minutes: number;
     seconds: number;
   };
 
   export let blackClock: {
-    waiting: boolean;
+    state: string;
     minutes: number;
     seconds: number;
   };
 
   export let whiteSpares: {
-    pawnCount: number;
-    knightCount: number;
-    bishopCount: number;
-    rookCount: number;
-    queenCount: number;
+    pawn: number;
+    knight: number;
+    bishop: number;
+    rook: number;
+    queen: number;
   };
 
   export let blackSpares: {
-    pawnCount: number;
-    knightCount: number;
-    bishopCount: number;
-    rookCount: number;
-    queenCount: number;
+    pawn: number;
+    knight: number;
+    bishop: number;
+    rook: number;
+    queen: number;
   };
 
   function spareDragNewPiece(e: Event) {
@@ -62,7 +66,9 @@
   {#if topColor == 'white'}
     <Meta
       color="white"
+      name="{whiteName}"
       avatar="{whiteAvatar}"
+      team="{whiteTeam}"
       clock="{whiteClock}"
       spares="{whiteSpares}"
       on:spareDragNewPiece="{spareDragNewPiece}"
@@ -70,7 +76,9 @@
   {:else}
     <Meta
       color="black"
+      name="{blackName}"
       avatar="{blackAvatar}"
+      team="{blackTeam}"
       clock="{blackClock}"
       spares="{blackSpares}"
       on:spareDragNewPiece="{spareDragNewPiece}"
@@ -80,7 +88,9 @@
   {#if bottomColor == 'white'}
     <Meta
       color="white"
+      name="{whiteName}"
       avatar="{whiteAvatar}"
+      team="{whiteTeam}"
       clock="{whiteClock}"
       spares="{whiteSpares}"
       on:spareDragNewPiece="{spareDragNewPiece}"
@@ -88,7 +98,9 @@
   {:else}
     <Meta
       color="black"
+      name="{blackName}"
       avatar="{blackAvatar}"
+      team="{blackTeam}"
       clock="{blackClock}"
       spares="{blackSpares}"
       on:spareDragNewPiece="{spareDragNewPiece}"

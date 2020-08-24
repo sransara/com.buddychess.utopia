@@ -16,7 +16,6 @@
   import * as msgbus from "../../common/msgbus";
   import * as wizard from "../../common/wizard";
   import * as utils from "../../common/utils";
-  import { tick } from "svelte";
 
   export let params: any = {};
 
@@ -114,8 +113,6 @@
     $spots$[$playerId$]["wizard"] = $wizard$;
     $spots$[$playerId$]["gamen"] = $gamen$ + 1;
     $spots$ = $spots$;
-
-    console.log($spots$, $wizard$, $gamen$);
 
     msgbus.sendAll(global.players, $roomId$, $playerId$, Object.keys($spots$), "updateSpots", $spots$);
     EventBus.publish("updatedSpots");

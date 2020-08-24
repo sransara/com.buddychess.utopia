@@ -1,6 +1,4 @@
 <script lang="typescript">
-  import { onMount } from "svelte";
-
   const digitToCrystals = [
     [1, 1, 1, 0, 1, 1, 1], // 0
     [0, 0, 1, 0, 0, 1, 0], // 1
@@ -45,7 +43,7 @@
     }
   }
 
-  export let waiting: boolean;
+  export let state: string;
 
   export let seconds: number;
   $: clocksvg && displayClockPart("s", seconds);
@@ -55,7 +53,7 @@
 
 <style>
   .waiting {
-    animation: pulse 4s infinite;
+    animation: pulse 2s infinite;
   }
 
   @keyframes pulse {
@@ -63,7 +61,7 @@
       background-color: #2f855a;
     }
     50% {
-      background-color: #22543d;
+      background-color: #1c4d37;
     }
     100% {
       background-color: #2f855a;
@@ -72,7 +70,7 @@
 </style>
 
 <!-- Adapted design from: https://codepen.io/dustindowell/pen/rxjxVp -->
-<div class="bg-green-500 h-full w-full" class:waiting>
+<div class="{state == 'timeout' ? 'bg-red-500' : 'bg-green-500'} h-full w-full" class:waiting="{state == 'waiting'}">
   <svg
     bind:this="{clocksvg}"
     class="h-full w-full opacity-75"

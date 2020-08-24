@@ -5,10 +5,9 @@
   import { onMount, onDestroy, tick } from "svelte";
   import Navbar from "./Navbar.svelte";
   import { EventBusSingleton as EventBus } from "light-event-bus";
-  import { _roomId$, roomId$, _playerId$, playerId$, spots$, wizard$, gamen$ } from "./common/datastore";
+  import { roomId$, playerId$, spots$, wizard$, gamen$, crazy$, acg$, bcg$ } from "./common/datastore";
   import { initPeerKey, setupPeerConnection, allSpotsInSync } from "./pages/Room/common";
   import { dbrest } from "./common/firebase";
-
   import * as global from "./common/dataglobal";
   import * as msgbus from "./common/msgbus";
   import * as wizard from "./common/wizard";
@@ -21,12 +20,12 @@
   }
 
   onMount(() => {
-    // Create
+    // Room/Create
     EventBus.subscribe("initPeerConnection", async (arg: any) => {
       if ($playerId$ != "host") return;
 
       const peerId = arg.from;
-      await initPeerKey(global.players, $_roomId$, peerId);
+      await initPeerKey(global.players, $roomId$, peerId);
       if ("peerConnection" in global.players[peerId]) return;
       await setupPeerConnection(global.players, $roomId$, $playerId$, peerId);
     });
@@ -38,6 +37,7 @@
       const spot = arg.payload;
       let errors: string[] = [];
       const spotskeys = Object.keys($spots$).filter((pid: string) => pid != peerId);
+
       if (spotskeys.filter((pid: string) => $spots$[pid]["name"] == spot["name"]).length > 0) {
         errors = [...errors, `Name: ${spot["name"]} is taken at the moment.`];
       }
@@ -103,7 +103,15 @@
       }
     });
 
-    // Join
+    // Room/Join
+    EventBus.subscribe("initPeerConnection", async (arg: any) => {
+      if ($playerId$ == "host") return;
+
+      const peerId = arg.from;
+      if ("peerConnection" in global.players[peerId]) return;
+      await setupPeerConnection(global.players, $roomId$, $playerId$, peerId);
+    });
+
     EventBus.subscribe("deletePlayer", (pid: any) => {
       if ($playerId$ == "host") return;
 
@@ -112,14 +120,6 @@
         replace(`/game/join/${$roomId$}`);
         window.location.reload();
       }
-    });
-
-    EventBus.subscribe("initPeerConnection", async (arg: any) => {
-      if ($playerId$ == "host") return;
-
-      const peerId = arg.from;
-      if ("peerConnection" in global.players[peerId]) return;
-      await setupPeerConnection(global.players, $roomId$, $playerId$, peerId);
     });
 
     EventBus.subscribe("updatedSpots", () => {
@@ -153,13 +153,30 @@
       EventBus.publish("updatedSpots");
     });
 
-    // Game/index
+    // Game
     EventBus.subscribe("updatedSpots", (arg: any) => {
       if (wizard.isIn($wizard$, wizard.steps.WAIT_FOR_GAME, "doing")) {
         if (allSpotsInSync($spots$, $wizard$, $gamen$)) {
           $wizard$ = wizard.next($wizard$);
         }
       }
+    });
+
+    EventBus.subscribe("madeMove", (arg: any) => {
+      const move = arg.payload;
+      if (move.fromId == $crazy$[$playerId$]["opId"]) {
+        $bcg$["fen"] = move["fen"];
+        $bcg$["lastMove"] = move["lastMove"];
+        $bcg$ = $bcg$;
+      } else {
+        $acg$["fen"] = move["fen"];
+        $acg$["lastMove"] = move["lastMove"];
+        $acg$ = $acg$;
+      }
+      $crazy$[move.fromId]["spares"] = move["spares"];
+      $crazy$[move.fromId]["clock"] = move["clock"];
+      $crazy$[$crazy$[move.fromId]["opId"]]["clock"]["state"] = "active";
+      $crazy$ = $crazy$;
     });
   });
 </script>

@@ -7,15 +7,15 @@
 
   import { Chess } from "chess.js";
 
-  type ClockState = { waiting: boolean; minutes: number; seconds: number };
+  type ClockState = { state: string; minutes: number; seconds: number };
   type SpareState = {
     dropType: "predrop" | "drop" | undefined;
     dropPiece: cgtypes.Role | undefined;
-    pawnCount: number;
-    knightCount: number;
-    bishopCount: number;
-    rookCount: number;
-    queenCount: number;
+    pawn: number;
+    knight: number;
+    bishop: number;
+    rook: number;
+    queen: number;
   };
 
   // @ts-ignore
@@ -25,10 +25,14 @@
   export let aChessground: Api = undefined;
   export let aChessgroundConfig: Config;
   export let aInteractive: cgtypes.Color | false;
+  export let aWhiteName: string;
   export let aWhiteAvatar: string;
+  export let aWhiteTeam: string;
   export let aWhiteClock: ClockState;
   export let aWhiteSpares: SpareState;
+  export let aBlackName: string;
   export let aBlackAvatar: string;
+  export let aBlackTeam: string;
   export let aBlackClock: ClockState;
   export let aBlackSpares: SpareState;
 
@@ -36,10 +40,14 @@
   export let bChessground: Api = undefined;
   export let bChessgroundConfig: Config;
   export let bInteractive: cgtypes.Color | false;
+  export let bWhiteName: string;
   export let bWhiteAvatar: string;
+  export let bWhiteTeam: string;
   export let bWhiteClock: ClockState;
   export let bWhiteSpares: SpareState;
+  export let bBlackName: string;
   export let bBlackAvatar: string;
+  export let bBlackTeam: string;
   export let bBlackClock: ClockState;
   export let bBlackSpares: SpareState;
 </script>
@@ -50,10 +58,14 @@
       bind:chessground="{aChessground}"
       chessgroundConfig="{aChessgroundConfig}"
       interactive="{aInteractive}"
+      whiteName="{aWhiteName}"
       whiteAvatar="{aWhiteAvatar}"
+      whiteTeam="{aWhiteTeam}"
       whiteClock="{aWhiteClock}"
       whiteSpares="{aWhiteSpares}"
+      blackName="{aBlackName}"
       blackAvatar="{aBlackAvatar}"
+      blackTeam="{aBlackTeam}"
       blackClock="{aBlackClock}"
       blackSpares="{aBlackSpares}"
     />
@@ -63,10 +75,14 @@
       bind:chessground="{bChessground}"
       chessgroundConfig="{bChessgroundConfig}"
       interactive="{bInteractive}"
+      whiteName="{bWhiteName}"
       whiteAvatar="{bWhiteAvatar}"
+      whiteTeam="{bWhiteTeam}"
       whiteClock="{bWhiteClock}"
       whiteSpares="{bWhiteSpares}"
+      blackName="{bBlackName}"
       blackAvatar="{bBlackAvatar}"
+      blackTeam="{bBlackTeam}"
       blackClock="{bBlackClock}"
       blackSpares="{bBlackSpares}"
     />

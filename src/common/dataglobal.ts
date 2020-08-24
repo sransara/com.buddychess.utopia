@@ -1,4 +1,4 @@
-import { DefaultDict } from "./utils";
+import { DefaultDict, tree } from "./utils";
 
 export const avatars = ["elephant", "giraffe", "monkey", "rabbit"];
 
@@ -10,3 +10,5 @@ export const teambg: any = {
 };
 
 export const players: any = new DefaultDict(Object);
+
+export const state: any = {};

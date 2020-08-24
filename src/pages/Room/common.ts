@@ -1,6 +1,7 @@
 import { dbrest } from "../../common/firebase";
 import * as msgbus from "../../common/msgbus";
 import * as wizard from "../../common/wizard";
+import * as utils from "../../common/utils";
 import { EventBusSingleton as EventBus } from "light-event-bus";
 
 export async function initPeerKey(players: any, roomId: string, peerId: string) {
@@ -34,39 +35,6 @@ function registerPeerConnectionListeners(peerConnection: any, peerId: string) {
   peerConnection.addEventListener("iceconnectionstatechange ", () => {
     console.log(`${peerId} --> ICE connection state change: ${peerConnection.iceConnectionState}`);
   });
-}
-
-class IntervalTimer {
-  fn: () => void;
-  time: number;
-  timer: number | undefined;
-
-  constructor(fn: () => void, time: number) {
-    this.fn = fn;
-    this.time = time;
-    this.timer = setInterval(fn, time);
-  }
-
-  stop() {
-    if (this.timer) {
-      clearInterval(this.timer);
-      this.timer = undefined;
-    }
-    return this;
-  }
-
-  start() {
-    if (!this.timer) {
-      this.stop();
-      this.timer = setInterval(this.fn, this.time);
-    }
-    return this;
-  }
-
-  reset(newTime = this.time) {
-    this.time = newTime;
-    return this.stop().start();
-  }
 }
 
 export function setupPeerConnection(players: any, roomId: string, myId: string, peerId: string) {
@@ -143,12 +111,12 @@ export function setupPeerConnection(players: any, roomId: string, myId: string, 
     peerConnectionCleanup();
   });
 
-  peer["dataChannelListenBeats"] = new IntervalTimer(() => {
+  peer["dataChannelListenBeats"] = new utils.IntervalTimer(() => {
     dataChannel.close();
     peerConnectionCleanup();
   }, 30000);
 
-  peer["dataChannelSendBeats"] = new IntervalTimer(() => {
+  peer["dataChannelSendBeats"] = new utils.IntervalTimer(() => {
     msgbus.send(players, roomId, myId, peerId, "heartbeat", {});
   }, 5000);
 

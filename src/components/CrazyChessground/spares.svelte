@@ -9,11 +9,11 @@
   export let color: cgtypes.Color;
   export let dropType: "predrop" | "drop" | undefined;
   export let dropPiece: cgtypes.Role | undefined;
-  export let pawnCount: number;
-  export let knightCount: number;
-  export let bishopCount: number;
-  export let rookCount: number;
-  export let queenCount: number;
+  export let pawn: number;
+  export let knight: number;
+  export let bishop: number;
+  export let rook: number;
+  export let queen: number;
 
   const dispatch = createEventDispatcher();
 
@@ -22,8 +22,7 @@
     if (event.button !== undefined && event.button !== 0) return;
     // support one finger touch only
     if (event.touches && event.touches.length > 1) return;
-
-    let element: HTMLSpanElement = event.target;
+    let element: HTMLSpanElement = event.currentTarget;
     const count = element.getAttribute("data-count");
     const role = element.getAttribute("data-role") as cgtypes.Role;
     const color = element.getAttribute("data-color") as cgtypes.Color;
@@ -75,7 +74,7 @@
   class:predrop="{dropType == 'predrop' && dropPiece == 'pawn'}"
   data-role="pawn"
   data-color="{color}"
-  data-count="{pawnCount}"
+  data-count="{pawn}"
   on:mousedown="{dragNewPiece}"
   on:touchstart="{dragNewPiece}"
 >
@@ -88,7 +87,7 @@
   class:predrop="{dropType == 'predrop' && dropPiece == 'knight'}"
   data-role="knight"
   data-color="{color}"
-  data-count="{knightCount}"
+  data-count="{knight}"
   on:mousedown="{dragNewPiece}"
   on:touchstart="{dragNewPiece}"
 >
@@ -101,7 +100,7 @@
   class:predrop="{dropType == 'predrop' && dropPiece == 'bishop'}"
   data-role="bishop"
   data-color="{color}"
-  data-count="{bishopCount}"
+  data-count="{bishop}"
   on:mousedown="{dragNewPiece}"
   on:touchstart="{dragNewPiece}"
 >
@@ -114,7 +113,7 @@
   class:predrop="{dropType == 'predrop' && dropPiece == 'rook'}"
   data-role="rook"
   data-color="{color}"
-  data-count="{rookCount}"
+  data-count="{rook}"
   on:mousedown="{dragNewPiece}"
   on:touchstart="{dragNewPiece}"
 >
@@ -127,7 +126,7 @@
   class:predrop="{dropType == 'predrop' && dropPiece == 'queen'}"
   data-role="queen"
   data-color="{color}"
-  data-count="{queenCount}"
+  data-count="{queen}"
   on:mousedown="{dragNewPiece}"
   on:touchstart="{dragNewPiece}"
 >

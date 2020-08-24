@@ -4,11 +4,8 @@ import * as cgtypes from "chessground/types";
 type dropType = "predrop" | "drop" | undefined;
 type dropPiece = cgtypes.Role | undefined;
 
-export let aFEN$ = writable("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-export let bFEN$ = writable("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-
 const initClockState = {
-  waiting: false,
+  state: false,
   minutes: 5,
   seconds: 0,
 };
@@ -16,11 +13,11 @@ const initClockState = {
 const initSpareState = {
   dropType: undefined,
   dropPiece: undefined,
-  pawnCount: 0,
-  knightCount: 0,
-  bishopCount: 0,
-  rookCount: 0,
-  queenCount: 0,
+  pawn: 0,
+  knight: 0,
+  bishop: 0,
+  rook: 0,
+  queen: 0,
 };
 
 export const aWhiteClock$ = writable({ ...initClockState });
