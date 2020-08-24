@@ -16,10 +16,10 @@ export async function initPeerKey(players: any, roomId: string, peerId: string) 
 const configuration = {
   iceServers: [
     {
-      urls: ["stun:stun1.l.google.com:19302", "stun:global.stun.twilio.com:3478?transport=udp"],
+      urls: ["stun:stun1.l.google.com:19302"],
     },
   ],
-  iceCandidatePoolSize: 2,
+  iceCandidatePoolSize: 10,
 };
 
 function registerPeerConnectionListeners(peerConnection: any, peerId: string) {
@@ -46,7 +46,7 @@ export function setupPeerConnection(players: any, roomId: string, myId: string, 
   let polite = myId < peerId;
   let makingOffer = false;
 
-  async function createOffer(options: any) {
+  peerConnection.addEventListener("negotiationneeded", async (options: any) => {
     try {
       makingOffer = true;
       const offer = await peerConnection.createOffer(options);
@@ -56,13 +56,11 @@ export function setupPeerConnection(players: any, roomId: string, myId: string, 
     } finally {
       makingOffer = false;
     }
-  }
-
-  peerConnection.addEventListener("negotiationneeded", createOffer);
+  });
 
   peerConnection.addEventListener("iceconnectionstatechange", () => {
-    if (peerConnection.iceConnectionState === "failed") {
-      createOffer({ iceRestart: true });
+    if (peerConnection.iceConnectionState === "failed" && peerId == "host") {
+      EventBus.publish("setupPeerConnectionIceFail");
     }
   });
 

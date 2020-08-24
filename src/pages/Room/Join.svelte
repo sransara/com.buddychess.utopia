@@ -198,6 +198,7 @@
           {:else if wizard.isIn($wizard$, wizard.steps.CREATE_OR_JOIN_ROOM_SPACE, 'doing')}
             <td in:fade>
               <span class="loading">Joining room queue</span>
+              <p class="text-base text-gray-700">Connecting to room host...</p>
               <p class="text-base text-gray-700">
                 Room ID:
                 <code>{params.id}</code>

@@ -3,11 +3,9 @@
   import Sidebar from "../../components/Sidebar.svelte";
   import Avatar from "../../components/Avatar/index.svelte";
   import Piece from "../../components/Piece.svelte";
-
   import { onMount, onDestroy } from "svelte";
   import { fade } from "svelte/transition";
   import { replace } from "svelte-spa-router";
-
   import { EventBusSingleton as EventBus } from "light-event-bus";
 
   import {
@@ -257,6 +255,7 @@
     chess.load(state["fen"]);
     cg.set({
       fen: chess.fen(),
+      lastMove: state["lastMove"],
       check: chess.in_check(),
       turnColor: chess.turn() === "w" ? "white" : "black",
       movable: {
