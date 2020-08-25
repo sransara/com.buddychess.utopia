@@ -292,7 +292,6 @@
             $bcg$ = $bcg$;
 
             if (metadata.captured) $crazy$[buddyId]["spares"][metadata.captured.role] += 1;
-
             $crazy$[myId]["spares"]["dropType"] = undefined;
             $crazy$[myId]["spares"]["dropRole"] = undefined;
             $crazy$[opId]["spares"]["dropType"] = undefined;
@@ -323,14 +322,14 @@
             $bcg$["lastMove"] = [dest as chtypes.Square];
             $bcg$ = $bcg$;
 
+            $crazy$[myId]["spares"][role] -= 1;
             $crazy$[myId]["spares"]["dropType"] = "drop";
             $crazy$[myId]["spares"]["dropRole"] = role;
             $crazy$[opId]["spares"]["dropType"] = undefined;
             $crazy$[opId]["spares"]["dropRole"] = undefined;
 
-            $crazy$[myId]["spares"][role] -= 1;
             $crazy$[myId]["clock"]["state"] = "stopped";
-            $crazy$[opId]["clock"]["state"] = "waiting";
+            $crazy$[opId]["clock"]["state"] = "active";
 
             $crazy$ = $crazy$;
 

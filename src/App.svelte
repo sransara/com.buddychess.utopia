@@ -20,13 +20,19 @@
   }
 
   onMount(() => {
+    // Room
+    EventBus.subscribe("simplePeerSignal", async (arg: any) => {
+      const peerId = arg.from;
+      global.players[peerId]["peerConnection"].signal(arg.payload);
+    });
+
     // Room/Create
     EventBus.subscribe("initPeerConnection", async (arg: any) => {
       if ($playerId$ != "host") return;
 
       const peerId = arg.from;
-      await initPeerKey(global.players, $roomId$, peerId);
       if ("peerConnection" in global.players[peerId]) return;
+      await initPeerKey(global.players, $roomId$, peerId);
       await setupPeerConnection(global.players, $roomId$, $playerId$, peerId);
     });
 

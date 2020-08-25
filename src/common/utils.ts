@@ -58,7 +58,6 @@ export class IntervalTimer {
   constructor(fn: () => void, time: number) {
     this.fn = fn;
     this.time = time;
-    this.timer = setInterval(fn, time);
   }
 
   stop() {

@@ -50,9 +50,9 @@ function firestoreSend(
 }
 
 export function dataChannelListen(players: any, fromId: string, myId: string) {
-  players[fromId]["dataChannel"].addEventListener("message", (event: MessageEvent) => {
-    players[fromId]["dataChannelListenBeats"].reset();
-    const msg = JSON.parse(event.data);
+  players[fromId]["peerConnection"].on("data", (data: any) => {
+    players[fromId]["peerConnectionListenBeats"].reset();
+    const msg = JSON.parse(data);
     if (msg["to"] == myId) {
       EventBus.publish(msg.method, msg);
     } else {
@@ -62,10 +62,8 @@ export function dataChannelListen(players: any, fromId: string, myId: string) {
 }
 
 function dataChannelSend(players: any, proxyId: string, fromId: string, toId: string, method: string, payload: any) {
-  if ("dataChannel" in players[proxyId] == false) return;
-  if (players[proxyId]["dataChannel"].readyState != "open") return;
-  players[proxyId]["dataChannelSendBeats"].reset();
-  players[proxyId]["dataChannel"].send(
+  players[proxyId]["peerConnectionSendBeats"].reset();
+  players[proxyId]["peerConnection"].send(
     JSON.stringify({
       from: fromId,
       to: toId,
@@ -77,14 +75,12 @@ function dataChannelSend(players: any, proxyId: string, fromId: string, toId: st
 
 export function send(players: any, roomId: string, fromId: string, toId: string, method: string, payload: any) {
   if (fromId == toId) return;
-  // console.log(players, fromId, toId, method);
-  if ("dataChannel" in players[toId]) {
-    //  && players[toId]["dataChannel"].readyState == "open"
+  if (players[toId]["peerConnected"]) {
     dataChannelSend(players, toId, fromId, toId, method, payload);
-  } else if ("dataChannel" in players["host"]) {
-    // && players["host"]["dataChannel"].readyState == "open"
+  } else if (players["host"]["peerConnected"]) {
     dataChannelSend(players, "host", fromId, toId, method, payload);
   } else {
+    console.log(fromId, toId, method, payload);
     firestoreSend(roomId, fromId, toId, players[toId]["publicKey"], method, payload);
   }
 }

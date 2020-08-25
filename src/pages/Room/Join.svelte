@@ -82,8 +82,6 @@
   async function markYourSpot() {
     $wizard$ = wizard.next($wizard$);
 
-    msgbus.firestoreUnsubscribe();
-
     _spotErrors = [];
     if (!_spotName) {
       _spotErrors = ["Name is required.", ..._spotErrors];
@@ -128,6 +126,8 @@
   if (wizard.isIn($wizard$, wizard.steps.WAIT_FOR_SPOTS, "todo")) waitForSpots();
   function waitForSpots() {
     $wizard$ = wizard.next($wizard$);
+
+    msgbus.firestoreUnsubscribe();
 
     $spots$[$playerId$]["wizard"] = $wizard$;
     $spots$[$playerId$]["gamen"] = $gamen$ + 1;

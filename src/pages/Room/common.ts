@@ -3,6 +3,7 @@ import * as msgbus from "../../common/msgbus";
 import * as wizard from "../../common/wizard";
 import * as utils from "../../common/utils";
 import { EventBusSingleton as EventBus } from "light-event-bus";
+import SimplePeer from "simple-peer/simplepeer.min.js";
 
 export async function initPeerKey(players: any, roomId: string, peerId: string) {
   if ("publicKey" in players[peerId]) return;
@@ -13,7 +14,7 @@ export async function initPeerKey(players: any, roomId: string, peerId: string) 
   Object.assign(players[peerId], json);
 }
 
-const configuration = {
+const webrtcConfig = {
   iceServers: [
     {
       urls: ["stun:stun1.l.google.com:19302"],
@@ -22,105 +23,51 @@ const configuration = {
   iceCandidatePoolSize: 10,
 };
 
-function registerPeerConnectionListeners(peerConnection: any, peerId: string) {
-  peerConnection.addEventListener("icegatheringstatechange", () => {
-    console.log(`${peerId} --> ICE gathering state changed: ${peerConnection.iceGatheringState}`);
-  });
-  peerConnection.addEventListener("connectionstatechange", () => {
-    console.log(`${peerId} --> Connection state change: ${peerConnection.connectionState}`);
-  });
-  peerConnection.addEventListener("signalingstatechange", () => {
-    console.log(`${peerId} --> Signaling state change: ${peerConnection.signalingState}`);
-  });
-  peerConnection.addEventListener("iceconnectionstatechange ", () => {
-    console.log(`${peerId} --> ICE connection state change: ${peerConnection.iceConnectionState}`);
-  });
-}
-
 export function setupPeerConnection(players: any, roomId: string, myId: string, peerId: string) {
-  const peer = players[peerId];
-  let peerConnection = (peer["peerConnection"] = new RTCPeerConnection(configuration));
-  registerPeerConnectionListeners(peerConnection, peerId);
+  if ("peerConnection" in players[peerId]) return;
+
   msgbus.send(players, roomId, myId, peerId, "initPeerConnection", {});
 
-  let polite = myId < peerId;
-  let makingOffer = false;
+  let peerConnection = (players[peerId]["peerConnection"] = new SimplePeer({
+    initiator: myId > peerId,
+    config: webrtcConfig,
+  }));
+  players[peerId]["peerConnected"] = false;
 
-  peerConnection.addEventListener("negotiationneeded", async (options: any) => {
-    try {
-      makingOffer = true;
-      const offer = await peerConnection.createOffer(options);
-      if (peerConnection.signalingState != "stable") return;
-      await peerConnection.setLocalDescription(offer);
-      msgbus.send(players, roomId, myId, peerId, "withSessionDescription", peerConnection.localDescription);
-    } finally {
-      makingOffer = false;
-    }
+  peerConnection.on("signal", (data: any) => {
+    msgbus.send(players, roomId, myId, peerId, "simplePeerSignal", data);
   });
 
-  peerConnection.addEventListener("iceconnectionstatechange", () => {
-    if (peerConnection.iceConnectionState === "failed" && peerId == "host") {
-      EventBus.publish("setupPeerConnectionIceFail");
-    }
+  peerConnection.on("error", (err: any) => {
+    EventBus.publish("simplePeerError", err);
   });
-
-  EventBus.subscribe("withSessionDescription", async (arg: any) => {
-    if (arg.from != peerId) return;
-    const description = arg.payload;
-    const offerCollision = description.type == "offer" && (makingOffer || peerConnection.signalingState != "stable");
-    if (!polite && offerCollision) return;
-    if (offerCollision) {
-      await Promise.all([
-        // https://stackoverflow.com/a/61980233
-        peerConnection.setLocalDescription({ type: "rollback" }),
-        peerConnection.setRemoteDescription(description),
-      ]);
-    } else {
-      await peerConnection.setRemoteDescription(description);
-    }
-    if (description.type == "offer") {
-      await peerConnection.setLocalDescription(await peerConnection.createAnswer());
-      msgbus.send(players, roomId, myId, peerId, "withSessionDescription", peerConnection.localDescription);
-    }
-  });
-
-  peerConnection.addEventListener("icecandidate", (event: any) => {
-    if (!event.candidate) return;
-    msgbus.send(players, roomId, myId, peerId, "addIceCandidate", event.candidate);
-  });
-
-  EventBus.subscribe("addIceCandidate", async (arg: any) => {
-    if (arg.from != peerId) return;
-    await peerConnection.addIceCandidate(new RTCIceCandidate(arg.payload)).catch(() => {});
-  });
-
-  const dataChannel = peerConnection.createDataChannel("msgbus", { negotiated: true, id: 0 });
 
   function peerConnectionCleanup() {
     if (peerId in players == false) return;
-    peerConnection.close();
-    players[peerId]["dataChannelListenBeats"].stop();
-    players[peerId]["dataChannelSendBeats"].stop();
-    EventBus.publish("deletePlayer", peerId);
+    console.log("peerConnectionCleanup");
+    players[peerId]["peerConnectionListenBeats"].stop();
+    players[peerId]["peerConnectionSendBeats"].stop();
     delete players[peerId];
+    peerConnection.destroy();
+    EventBus.publish("deletePlayer", peerId);
   }
 
-  dataChannel.addEventListener("close", () => {
+  peerConnection.on("close", () => {
     peerConnectionCleanup();
   });
 
-  peer["dataChannelListenBeats"] = new utils.IntervalTimer(() => {
-    dataChannel.close();
+  players[peerId]["peerConnectionListenBeats"] = new utils.IntervalTimer(() => {
     peerConnectionCleanup();
   }, 30000);
 
-  peer["dataChannelSendBeats"] = new utils.IntervalTimer(() => {
+  players[peerId]["peerConnectionSendBeats"] = new utils.IntervalTimer(() => {
     msgbus.send(players, roomId, myId, peerId, "heartbeat", {});
   }, 5000);
 
   return new Promise((resolve) => {
-    dataChannel.addEventListener("open", (event) => {
-      peer["dataChannel"] = dataChannel;
+    peerConnection.on("connect", () => {
+      console.log("connected");
+      players[peerId]["peerConnected"] = true;
       msgbus.dataChannelListen(players, peerId, myId);
       resolve();
     });
