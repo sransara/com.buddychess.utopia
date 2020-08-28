@@ -38,13 +38,8 @@ export function setupPeerConnection(players: any, roomId: string, myId: string, 
     msgbus.send(players, roomId, myId, peerId, "simplePeerSignal", data);
   });
 
-  peerConnection.on("error", (err: any) => {
-    EventBus.publish("simplePeerError", err);
-  });
-
   function peerConnectionCleanup() {
     if (peerId in players == false) return;
-    console.log("peerConnectionCleanup");
     players[peerId]["peerConnectionListenBeats"].stop();
     players[peerId]["peerConnectionSendBeats"].stop();
     delete players[peerId];
@@ -54,6 +49,11 @@ export function setupPeerConnection(players: any, roomId: string, myId: string, 
 
   peerConnection.on("close", () => {
     peerConnectionCleanup();
+  });
+
+  peerConnection.on("error", (err: any) => {
+    if (players[peerId]["peerConnected"]) peerConnectionCleanup();
+    EventBus.publish("simplePeerError", err);
   });
 
   players[peerId]["peerConnectionListenBeats"] = new utils.IntervalTimer(() => {
@@ -66,7 +66,6 @@ export function setupPeerConnection(players: any, roomId: string, myId: string, 
 
   return new Promise((resolve) => {
     peerConnection.on("connect", () => {
-      console.log("connected");
       players[peerId]["peerConnected"] = true;
       msgbus.dataChannelListen(players, peerId, myId);
       resolve();

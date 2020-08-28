@@ -79,8 +79,7 @@ export function send(players: any, roomId: string, fromId: string, toId: string,
     dataChannelSend(players, toId, fromId, toId, method, payload);
   } else if (players["host"]["peerConnected"]) {
     dataChannelSend(players, "host", fromId, toId, method, payload);
-  } else {
-    console.log(fromId, toId, method, payload);
+  } else if (players[toId]["publicKey"]) {
     firestoreSend(roomId, fromId, toId, players[toId]["publicKey"], method, payload);
   }
 }

@@ -1,5 +1,7 @@
 const production = !process.env.ROLLUP_WATCH;
 
+const defaultTheme = require("tailwindcss/defaultTheme");
+
 module.exports = {
   purge: {
     enabled: production,
@@ -10,6 +12,10 @@ module.exports = {
   },
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["Source Sans Pro"],
+        mono: ["Source Code Pro"],
+      },
       padding: {
         "1/8": "12.5%",
       },

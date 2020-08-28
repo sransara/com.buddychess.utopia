@@ -1,11 +1,5 @@
 <script lang="typescript">
-  import { link } from "svelte-spa-router";
+  import { fade } from "svelte/transition";
 </script>
 
-<style>
-  a {
-    color: blue;
-  }
-</style>
-
-<a href="/game" use:link>Go to game page</a>
+<div in:fade></div>

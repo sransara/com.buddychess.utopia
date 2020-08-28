@@ -70,7 +70,7 @@ function serve() {
   let server;
 
   function toExit() {
-    if (server) server.kill(0);
+    if (server) server.kill("SIGINT");
   }
 
   return {
