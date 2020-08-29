@@ -73,7 +73,7 @@
 
   onMount(async () => {
     window.addEventListener("resize", fitViewport);
-    await utils.sleep(500);
+    await utils.sleep(2000);
     fitViewport();
     if (wizard.isAfter($wizard$, wizard.steps.WAIT_FOR_GAME)) visibleSplash = false;
   });

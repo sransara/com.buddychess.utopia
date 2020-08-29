@@ -1,6 +1,7 @@
 import * as firebase from "firebase/app";
 import { encrypt, decrypt } from "./crypto";
 import { EventBusSingleton as EventBus } from "light-event-bus";
+import * as errors from "./errors";
 
 let firestoreUnsubscriber: any;
 
@@ -16,15 +17,21 @@ export function firestoreListen(roomId: string, toId: string, toSecretKey: Uint8
     .doc(roomId)
     .collection("msgs")
     .where("to", "==", toId)
-    .onSnapshot((snapshot) => {
-      snapshot.docChanges().forEach(function (change) {
-        if (change.type === "added") {
-          const msg = change.doc.data();
-          msg["payload"] = JSON.parse(decrypt(toSecretKey, msg["payload"]));
-          EventBus.publish(msg.method, msg);
-        }
-      });
-    });
+    .onSnapshot(
+      (snapshot) => {
+        snapshot.docChanges().forEach(function (change) {
+          if (change.type === "added") {
+            const msg = change.doc.data();
+            msg["payload"] = JSON.parse(decrypt(toSecretKey, msg["payload"]));
+            EventBus.publish(msg.method, msg);
+          }
+        });
+      },
+      (err) => {
+        console.log(err);
+        return errors.fatal(errors.fatalEnum.FIRESTORE_ERROR);
+      }
+    );
 }
 
 function firestoreSend(
@@ -46,6 +53,10 @@ function firestoreSend(
       to: toId,
       method: method,
       payload: encrypt(toPublicKey, JSON.stringify(payload)),
+    })
+    .catch((err) => {
+      console.log(err);
+      return errors.fatal(errors.fatalEnum.FIRESTORE_ERROR);
     });
 }
 

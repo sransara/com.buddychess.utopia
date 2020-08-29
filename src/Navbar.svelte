@@ -1,6 +1,7 @@
 <script lang="typescript">
   import { link, location } from "svelte-spa-router";
   import { _roomId$ } from "./common/datastore";
+  import { replace } from "svelte-spa-router";
 </script>
 
 <header
@@ -10,19 +11,28 @@
   <span class="px-1 inline-block hover:text-yellow-600">
     <a class="inline-block" href="/" use:link>&#x2658;Buddy Chess</a>
   </span>
-  <span class="px-2 mx-2 inline-block bg-blue-500 hover:bg-blue-700 rounded-md">
-    {#if !$_roomId$}
-      <a class="inline-block" href="/room/create" use:link>Create a room</a>
-    {:else}
-      <button
-        class="inline-block focus:outline-none"
-        on:click="{() => {
-          window.location.hash = '/';
-          window.location.reload();
-        }}"
-      >
-        Leave Room
-      </button>
-    {/if}
-  </span>
+  {#if !$_roomId$}
+    <button
+      class="px-2 mx-2 inline-block bg-blue-500 hover:bg-blue-700 rounded-md focus:outline-none"
+      on:click="{() => replace('/room/create')}"
+    >
+      Create a room
+    </button>
+  {:else}
+    <button
+      class="px-2 mx-2 inline-block bg-blue-500 hover:bg-blue-700 rounded-md focus:outline-none"
+      on:click="{() => replace('/room/create')}"
+    >
+      Back to game room
+    </button>
+    <button
+      class="px-2 mx-2 inline-block bg-blue-500 hover:bg-blue-700 rounded-md focus:outline-none"
+      on:click="{() => {
+        window.location.hash = '/';
+        window.location.reload();
+      }}"
+    >
+      Leave this game room
+    </button>
+  {/if}
 </header>

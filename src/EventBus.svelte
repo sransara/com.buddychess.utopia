@@ -1,7 +1,7 @@
 <script lang="typescript">
   import { onMount } from "svelte";
   import { EventBusSingleton as EventBus } from "light-event-bus";
-  import { location, replace } from "svelte-spa-router";
+  import { replace } from "svelte-spa-router";
 
   import { roomId$, playerId$, spots$, wizard$, gamen$, crazy$, acg$, bcg$ } from "./common/datastore";
   import { initPeerKey, setupPeerConnection, allSpotsInSync } from "./pages/Room/common";
@@ -9,6 +9,7 @@
   import * as global from "./common/dataglobal";
   import * as msgbus from "./common/msgbus";
   import * as wizard from "./common/wizard";
+  import * as errors from "./common/errors";
 
   onMount(() => {
     // Room
@@ -71,11 +72,20 @@
           $wizard$ = wizard.next($wizard$);
           $gamen$ = $gamen$ + 1;
           replace(`/game/create/${$roomId$}`);
+          EventBus.publish("roomChatMsg", {
+            from: "internal",
+            data: "All players synced. Starting new game.",
+          });
         }
       } else if (wizard.isAfter($wizard$, wizard.steps.WAIT_FOR_SPOTS)) {
         if (Object.keys($spots$).length != 4) {
           $wizard$ = wizard.todo(wizard.steps.WAIT_FOR_SPOTS);
           replace(`/room/create/${$roomId$}`);
+          EventBus.publish("roomChatMsg", {
+            from: "internal",
+            type: "error",
+            data: "Game aborted. We have lost the connection to a player.",
+          });
         }
       }
     });
@@ -113,9 +123,7 @@
       if ($playerId$ == "host") return;
 
       if (pid == "host") {
-        alert("Disconnected from the host!");
-        window.location.hash = `/room/join/${$roomId$}`;
-        window.location.reload();
+        return errors.fatal(errors.fatalEnum.HOST_DISCONNECTED);
       }
     });
 
@@ -127,11 +135,20 @@
           $wizard$ = wizard.next($wizard$);
           $gamen$ = $gamen$ + 1;
           replace(`/game/join/${$roomId$}`);
+          EventBus.publish("roomChatMsg", {
+            from: "internal",
+            data: "All players synced. Starting new game.",
+          });
         }
       } else if (wizard.isAfter($wizard$, wizard.steps.WAIT_FOR_SPOTS)) {
         if (Object.keys($spots$).length != 4) {
           $wizard$ = wizard.todo(wizard.steps.WAIT_FOR_SPOTS);
           replace(`/room/join/${$roomId$}`);
+          EventBus.publish("roomChatMsg", {
+            from: "internal",
+            type: "error",
+            data: "Game aborted. The host has lost connection to a player.",
+          });
         }
       }
     });

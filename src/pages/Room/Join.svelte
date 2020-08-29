@@ -15,6 +15,7 @@
   import * as msgbus from "../../common/msgbus";
   import * as wizard from "../../common/wizard";
   import * as utils from "../../common/utils";
+  import * as errors from "../../common/errors";
 
   export let params: any = {};
 
@@ -43,10 +44,19 @@
       let response, json;
 
       response = await dbrest(`rooms/${params.id}.json`);
-      if (!response.ok) throw new Error(`${response.status}`);
+      if (!response.ok) {
+        console.log(response.status);
+        return errors.fatal(errors.fatalEnum.FIRESTORE_ERROR);
+      }
       json = await response.json();
-      if (!json) throw new Error("Room not found.");
-      if (json.status != "open") throw new Error("Room is not open.");
+      if (!json) {
+        console.log("Room not found.");
+        return errors.fatal(errors.fatalEnum.NO_SUCH_ROOM);
+      }
+      if (json.status != "open") {
+        console.log("Room is not open.");
+        return errors.fatal(errors.fatalEnum.ROOM_FULL);
+      }
       $_roomId$ = params.id as string;
       Object.assign(global.players["host"], json["players"]["host"]);
 
@@ -54,7 +64,11 @@
         method: "POST",
         body: JSON.stringify({ publicKey: myPublicKey }),
       });
-      if (!response.ok) throw new Error(`${response.status}`);
+      if (!response.ok) {
+        console.log(response.status);
+        return errors.fatal(errors.fatalEnum.FIRESTORE_ERROR);
+      }
+
       json = await response.json();
       $_playerId$ = json.name as string;
 
@@ -70,6 +84,7 @@
       $wizard$ = wizard.next($wizard$);
     } catch (err) {
       console.log(err);
+      return errors.fatal(errors.fatalEnum.UNEXPECTED);
     }
   }
 
@@ -127,6 +142,11 @@
     $wizard$ = wizard.next($wizard$);
 
     msgbus.firestoreUnsubscribe();
+
+    EventBus.publish("roomChatMsg", {
+      from: "internal",
+      data: "Waiting for players to start a new game.",
+    });
 
     $spots$[$playerId$]["wizard"] = $wizard$;
     $spots$[$playerId$]["gamen"] = $gamen$ + 1;
@@ -296,7 +316,7 @@
                     team="{utils.getAttr($spots$, [pid, 'team'])}"
                   />
                   {#if utils.getAttr($spots$, [pid, 'gamen']) == $gamen$ + 1}
-                    <span class="text-xs inline-block bg-green-200 rounded-sm px-2 py-1 ml-2">ready</span>
+                    <span class="text-xs inline-block bg-green-200 rounded-sm px-2 py-1 ml-2">in sync</span>
                   {/if}
                 </li>
               {/each}

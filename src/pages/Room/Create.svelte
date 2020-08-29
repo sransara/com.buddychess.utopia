@@ -9,7 +9,7 @@
 
   import { myPublicKey, mySecretKey } from "../../common/crypto";
   import { dbrest } from "../../common/firebase";
-  import { initPeerKey, setupPeerConnection, allSpotsInSync } from "./common";
+  import { initPeerKey, peerConnectionCleanup, setupPeerConnection, allSpotsInSync } from "./common";
   import { _roomId$, roomId$, _playerId$, playerId$, spots$, wizard$, gamen$ } from "../../common/datastore";
   import * as global from "../../common/dataglobal";
   import * as msgbus from "../../common/msgbus";
@@ -53,7 +53,10 @@
           },
         }),
       });
-      if (!response.ok) throw new Error(`${response.status}`);
+      if (!response.ok) {
+        console.log(response.status);
+        return errors.fatal(errors.fatalEnum.FIRESTORE_ERROR);
+      }
       let json = await response.json();
       $_roomId$ = json.name;
 
@@ -64,6 +67,7 @@
       $wizard$ = wizard.next($wizard$);
     } catch (err) {
       console.log(err);
+      return errors.fatal(errors.fatalEnum.UNEXPECTED);
     }
   }
 
@@ -109,6 +113,11 @@
   function waitForSpots() {
     $wizard$ = wizard.next($wizard$);
     dbrest(`rooms/${$roomId$}/status.json`, { method: "PUT", body: '"open"' });
+
+    EventBus.publish("roomChatMsg", {
+      from: "internal",
+      data: "Waiting for players to start a new game.",
+    });
 
     $spots$[$playerId$]["wizard"] = $wizard$;
     $spots$[$playerId$]["gamen"] = $gamen$ + 1;
@@ -264,7 +273,16 @@
                     team="{utils.getAttr($spots$, [pid, 'team'])}"
                   />
                   {#if utils.getAttr($spots$, [pid, 'gamen']) == $gamen$ + 1}
-                    <span class="text-xs inline-block bg-green-200 rounded-sm px-2 py-1 ml-2">ready</span>
+                    <span class="text-xs inline-block bg-green-200 rounded-sm px-2 py-1 ml-2">in sync</span>
+                  {/if}
+                  {#if pid != $playerId$}
+                    <button
+                      class="bg-blue-500 hover:bg-blue-700 text-white text-xs px-2 py-1 ml-2 rounded-sm
+                      focus:outline-none"
+                      on:click="{() => peerConnectionCleanup(global.players, pid)}"
+                    >
+                      kick
+                    </button>
                   {/if}
                 </li>
               {/each}

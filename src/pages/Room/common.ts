@@ -2,13 +2,17 @@ import { dbrest } from "../../common/firebase";
 import * as msgbus from "../../common/msgbus";
 import * as wizard from "../../common/wizard";
 import * as utils from "../../common/utils";
+import * as errors from "../../common/errors";
 import { EventBusSingleton as EventBus } from "light-event-bus";
 import SimplePeer from "simple-peer/simplepeer.min.js";
 
 export async function initPeerKey(players: any, roomId: string, peerId: string) {
   if ("publicKey" in players[peerId]) return;
   let response = await dbrest(`rooms/${roomId}/players/${peerId}.json`);
-  if (!response.ok) throw new Error(`${response.status}`);
+  if (!response.ok) {
+    console.log(response.status);
+    return errors.fatal(errors.fatalEnum.FIRESTORE_ERROR);
+  }
   let json = await response.json();
   if (!json) throw new Error("Player not found.");
   Object.assign(players[peerId], json);
@@ -22,6 +26,17 @@ const webrtcConfig = {
   ],
   iceCandidatePoolSize: 10,
 };
+
+export function peerConnectionCleanup(players: any, peerId: string) {
+  if (peerId in players == false) return;
+  if (players[peerId]["peerConnected"] == false) return;
+  players[peerId]["peerConnected"] = false;
+  players[peerId]["peerConnectionListenBeats"].stop();
+  players[peerId]["peerConnectionSendBeats"].stop();
+  players[peerId]["peerConnection"].destroy();
+  delete players[peerId];
+  EventBus.publish("simplePeerClose", peerId);
+}
 
 export function setupPeerConnection(players: any, roomId: string, myId: string, peerId: string) {
   if ("peerConnection" in players[peerId]) return;
@@ -38,21 +53,12 @@ export function setupPeerConnection(players: any, roomId: string, myId: string, 
     msgbus.send(players, roomId, myId, peerId, "simplePeerSignal", data);
   });
 
-  function peerConnectionCleanup() {
-    if (peerId in players == false) return;
-    players[peerId]["peerConnectionListenBeats"].stop();
-    players[peerId]["peerConnectionSendBeats"].stop();
-    delete players[peerId];
-    peerConnection.destroy();
-    EventBus.publish("simplePeerClose", peerId);
-  }
-
   peerConnection.on("close", () => {
-    peerConnectionCleanup();
+    peerConnectionCleanup(players, peerId);
   });
 
   peerConnection.on("error", (err: any) => {
-    if (players[peerId]["peerConnected"]) peerConnectionCleanup();
+    if (players[peerId]["peerConnected"]) peerConnectionCleanup(players, peerId);
     EventBus.publish("simplePeerError", {
       peer: peerId,
       error: err,
@@ -60,7 +66,7 @@ export function setupPeerConnection(players: any, roomId: string, myId: string, 
   });
 
   players[peerId]["peerConnectionListenBeats"] = new utils.IntervalTimer(() => {
-    peerConnectionCleanup();
+    peerConnectionCleanup(players, peerId);
   }, 30000);
 
   players[peerId]["peerConnectionSendBeats"] = new utils.IntervalTimer(() => {
