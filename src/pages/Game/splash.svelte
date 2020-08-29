@@ -53,8 +53,8 @@
 
 <div
   transition:fade
-  class="absolute left-0 bg-white items-center justify-center z-50 w-4/5 max-w-4/5 h-full max-h-full flex overflow-auto"
-  style="height: calc(100vh - 5rem);"
+  class="absolute left-0 bg-white items-center justify-center z-50 max-h-full flex overflow-auto"
+  style="min-height: 24rem; height: calc(100vh - 5rem); min-width: 60rem; width: 80vw;"
 >
   <div class="flex flex-col">
     <div class="flex w-64 h-16 items-center justify-center text-3xl">

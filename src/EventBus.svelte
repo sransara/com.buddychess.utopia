@@ -89,7 +89,7 @@
       EventBus.publish("updatedSpots");
     });
 
-    EventBus.subscribe("deletePlayer", async (pid: any) => {
+    EventBus.subscribe("simplePeerClose", async (pid: any) => {
       if ($playerId$ != "host") return;
 
       if (pid in $spots$) {
@@ -109,7 +109,7 @@
       await setupPeerConnection(global.players, $roomId$, $playerId$, peerId);
     });
 
-    EventBus.subscribe("deletePlayer", (pid: any) => {
+    EventBus.subscribe("simplePeerClose", (pid: any) => {
       if ($playerId$ == "host") return;
 
       if (pid == "host") {
@@ -160,6 +160,8 @@
     });
 
     EventBus.subscribe("afterMove", (arg: any) => {
+      if (wizard.isAfter($wizard$, wizard.steps.GAME_TIME)) return;
+
       const move = arg.payload;
       if (move.fromId == $crazy$[$playerId$]["opId"]) {
         $bcg$["fen"] = move["fen"];
@@ -185,6 +187,8 @@
     });
 
     EventBus.subscribe("afterNewPieceMove", (arg: any) => {
+      if (wizard.isAfter($wizard$, wizard.steps.GAME_TIME)) return;
+
       const move = arg.payload;
       if (move.fromId == $crazy$[$playerId$]["opId"]) {
         $bcg$["fen"] = move["fen"];
@@ -207,6 +211,29 @@
       $crazy$[$crazy$[move.fromId]["opId"]]["clock"]["state"] = "active";
 
       $crazy$ = $crazy$;
+    });
+
+    EventBus.subscribe("endGame", (arg: any) => {
+      if (wizard.isIn($wizard$, wizard.steps.END_GAME)) return;
+
+      const endgame = arg.payload;
+      $crazy$[endgame.fromId]["spares"] = endgame["spares"];
+      $crazy$[endgame.fromId]["clock"] = endgame["clock"];
+      $crazy$ = $crazy$;
+
+      $wizard$ = wizard.todo(wizard.steps.END_GAME);
+
+      clearInterval(global.state["gameTimer"]);
+
+      EventBus.publish("roomChatMsg", {
+        from: "endgame",
+        spot: {
+          name: $spots$[endgame.fromId]["name"],
+          avatar: $spots$[endgame.fromId]["avatar"],
+          team: $spots$[endgame.fromId]["team"],
+        },
+        event: endgame["event"],
+      });
     });
   });
 </script>

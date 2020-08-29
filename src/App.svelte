@@ -4,7 +4,7 @@
   import { routes } from "./routes";
   import Navbar from "./Navbar.svelte";
   import EventBus from "./EventBus.svelte";
-  import Sidebar from "./components/Sidebar.svelte";
+  import Sidebar from "./Sidebar.svelte";
 
   let currentRoute: any = { title: "Home", location: "/" };
   function routeLoaded(event: any): any {
@@ -18,7 +18,7 @@
 
 <EventBus />
 <Navbar />
-<div class="flex" style="min-width: 75rem;">
+<div class="flex" style="min-width: 75rem; min-height: 24rem;">
   <div class="w-4/5">
     <Router {routes} on:routeLoaded="{routeLoaded}" />
   </div>

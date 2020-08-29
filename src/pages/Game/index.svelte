@@ -1,6 +1,6 @@
 <script lang="typescript">
   import BuddyChessground from "../../components/BuddyChessground.svelte";
-  import Sidebar from "../../components/Sidebar.svelte";
+  import Sidebar from "../../Sidebar.svelte";
   import Splash from "./splash.svelte";
   import { onMount, onDestroy } from "svelte";
   import { replace } from "svelte-spa-router";
@@ -60,11 +60,13 @@
   function fitViewport() {
     // assume scroll bar width: 15
     const rect = buddyChessground.getBoundingClientRect();
+    const windowHeight = Math.max(window.innerHeight, utils.convertRemToPixels(24));
     const nextH = Math.floor(window.innerHeight - utils.convertRemToPixels(5));
     const currentW = rect.right - rect.left;
     const currentH = rect.bottom - rect.top;
     let nextW = (nextH * currentW) / currentH;
-    const maxW = (window.innerWidth * 4) / 5 - 15;
+    const windowWidth = Math.max(window.innerWidth, utils.convertRemToPixels(75));
+    const maxW = (windowWidth * 4) / 5 - 15;
     nextW = Math.min(nextW, maxW);
     buddyChessground.style.width = `${Math.floor(nextW)}px`;
   }
@@ -97,8 +99,8 @@
   const aChess = new Chess();
   const bChess = new Chess();
 
-  let bInteractive: cgtypes.Color | false = myColor;
   let aInteractive: cgtypes.Color | false = false;
+  let bInteractive: cgtypes.Color | false = myColor;
 
   const seating: any = {
     b: {
@@ -229,12 +231,7 @@
         if (mins < 0) {
           $crazy$[pid]["clock"]["state"] = "timeout";
           if (pid == myId) {
-            EventBus.publish("gameEnded", {
-              fromId: pid,
-              event: "timeout",
-              clock: $crazy$[pid]["clock"],
-            });
-            clearInterval(global.state["gameTimer"]);
+            endGame("ran out of time");
           }
         } else {
           $crazy$[pid]["clock"]["seconds"] = secs;
@@ -247,29 +244,78 @@
     $wizard$ = wizard.next($wizard$);
   }
 
-  function loadState(cg: Api, chess: chtypes.ChessInstance, state: any) {
+  function endGame(event: "got checkmated" | "ran out of time") {
+    $wizard$ = wizard.todo(wizard.steps.END_GAME);
+
+    clearInterval(global.state["gameTimer"]);
+    bChessground.set({
+      viewOnly: true,
+    });
+
+    msgbus.sendAll(global.players, $roomId$, $playerId$, Object.keys($spots$), "endGame", {
+      fromId: myId,
+      spares: $crazy$[myId]["spares"],
+      clock: $crazy$[myId]["clock"],
+      event: event,
+    });
+
+    EventBus.publish("roomChatMsg", {
+      from: "endgame",
+      spot: {
+        name: `${$spots$[$playerId$]["name"]} (you)`,
+        avatar: $spots$[$playerId$]["avatar"],
+        team: $spots$[$playerId$]["team"],
+      },
+      event: event,
+    });
+
+    $wizard$ = wizard.next($wizard$);
+  }
+
+  function loadState(
+    cg: Api,
+    chess: chtypes.ChessInstance,
+    state: any,
+    abcg: string,
+    interactive: cgtypes.Color | false
+  ) {
     chess.load(state["fen"]);
+    const turnColor = chess.turn() === "w" ? "white" : "black";
     cg.set({
       fen: chess.fen(),
       lastMove: state["lastMove"],
       check: chess.in_check(),
-      turnColor: chess.turn() === "w" ? "white" : "black",
+      turnColor: turnColor,
       movable: {
         dests: chessx.moves(chess),
       },
     });
+
+    if (abcg != "b") return;
+    if (interactive != turnColor) return;
+
+    if (!chessx.inCrazyCheckmate(chess, $crazy$[seating[abcg][interactive]]["spares"])) return;
+    // checkmated
+    endGame("got checkmated");
   }
 
   $: if (aChessground) {
-    loadState(aChessground, aChess, $acg$);
+    loadState(aChessground, aChess, $acg$, "a", aInteractive);
   }
 
   $: if (bChessground) {
-    loadState(bChessground, bChess, $bcg$);
+    loadState(bChessground, bChess, $bcg$, "b", bInteractive);
   }
 
-  $: if (bChessground && [myId, opId].find((pid) => $crazy$[pid]["clock"]["state"] == "timeout")) {
-    bChessground.stop();
+  $: if (wizard.isIn($wizard$, wizard.steps.END_GAME, "todo")) {
+    $wizard$ = wizard.todo(wizard.steps.END_GAME);
+
+    clearInterval(global.state["gameTimer"]);
+    bChessground.set({
+      viewOnly: true,
+    });
+
+    $wizard$ = wizard.next($wizard$);
   }
 
   function initChessground() {
@@ -279,7 +325,7 @@
           after: (orig: cgtypes.Key, dest: cgtypes.Key, metadata: cgtypes.MoveMetadata) => {
             const newFEN = chessx.move(bChess, orig, dest);
             if (!newFEN) {
-              loadState(bChessground, bChess, $bcg$);
+              loadState(bChessground, bChess, $bcg$, "b", false);
               return;
             }
 
@@ -310,7 +356,7 @@
             const color = bChess.turn() == "w" ? "white" : "black";
             const newFEN = chessx.put(bChess, { role: role, color: color }, dest);
             if (!newFEN) {
-              loadState(bChessground, bChess, $bcg$);
+              loadState(bChessground, bChess, $bcg$, "b", false);
               return;
             }
 

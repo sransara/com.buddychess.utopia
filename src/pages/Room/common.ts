@@ -44,7 +44,7 @@ export function setupPeerConnection(players: any, roomId: string, myId: string, 
     players[peerId]["peerConnectionSendBeats"].stop();
     delete players[peerId];
     peerConnection.destroy();
-    EventBus.publish("deletePlayer", peerId);
+    EventBus.publish("simplePeerClose", peerId);
   }
 
   peerConnection.on("close", () => {
@@ -53,7 +53,10 @@ export function setupPeerConnection(players: any, roomId: string, myId: string, 
 
   peerConnection.on("error", (err: any) => {
     if (players[peerId]["peerConnected"]) peerConnectionCleanup();
-    EventBus.publish("simplePeerError", err);
+    EventBus.publish("simplePeerError", {
+      peer: peerId,
+      error: err,
+    });
   });
 
   players[peerId]["peerConnectionListenBeats"] = new utils.IntervalTimer(() => {

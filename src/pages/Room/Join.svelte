@@ -1,5 +1,4 @@
 <script lang="typescript">
-  import Sidebar from "../../components/Sidebar.svelte";
   import SpotForm from "./spot-form.svelte";
   import Spot from "./spot.svelte";
 
@@ -274,6 +273,7 @@
                   p-1 font-mono leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                   type="text"
                   on:click="{(e) => {
+                    e.target.focus();
                     e.target.select();
                   }}"
                 />

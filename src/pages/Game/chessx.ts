@@ -91,3 +91,20 @@ export function puts(chess: chtypes.ChessInstance, pieces: cgtypes.Piece[], squa
   if (apiece) return true;
   else return undefined;
 }
+
+export function inCrazyCheckmate(chess: chtypes.ChessInstance, spares: any) {
+  if (!chess.in_checkmate()) return false;
+
+  const turnColor = chess.turn() === "w" ? "white" : "black";
+  const pieces: any = Object.keys(spares)
+    .filter((k) => {
+      if (!["pawn", "knight", "bishop", "rook", "queen"].includes(k)) return false;
+      if (spares[k] <= 0) return false;
+      return true;
+    })
+    .map((r) => {
+      return { role: r, color: turnColor };
+    });
+  if (puts(chess, pieces)) return false;
+  return true;
+}

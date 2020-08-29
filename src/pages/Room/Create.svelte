@@ -15,6 +15,7 @@
   import * as msgbus from "../../common/msgbus";
   import * as wizard from "../../common/wizard";
   import * as utils from "../../common/utils";
+  import * as errors from "../../common/errors";
 
   export let params: any = {};
 
@@ -240,6 +241,7 @@
                   p-1 font-mono leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                   type="text"
                   on:click="{(e) => {
+                    e.target.focus();
                     e.target.select();
                   }}"
                 />
