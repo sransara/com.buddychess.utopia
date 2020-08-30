@@ -2,7 +2,9 @@
 
 ## A friendly place for your bughouse chess needs
 
-![Buddy Chess Utopia screenshot](./public/front/screenshot.png)
+Live on: https://utopia.buddychess.com/
+
+![Buddy Chess Utopia screenshot](./public/front/screenshot_full.png)
 
 ### What is this?
 
@@ -35,6 +37,8 @@ That's pretty much it. Read more thoroughly about Bughouse on [Wikipedia](https:
 - No central servers.
 - No tracking.
 
+All the pros are its own cons. Choose responsibly.
+
 ### And what's with the Utopia?
 
 There is no anti cheat mechanisms. We assume all players are good citizens in our utopia.
@@ -50,4 +54,4 @@ Standing on the shoulders of giants:
 - Assymetric encryption for public communication - https://github.com/dchest/tweetnacl-js
 - Chessboard - https://github.com/ornicar/chessground/
 - Original chess rules - https://github.com/jhlywa/chess.js/
-- frontend - Svelte and Tailwind
+- Frontend - Svelte and Tailwind
