@@ -1,4 +1,4 @@
-import * as firebase from "firebase/app";
+import firebase from "firebase/app";
 import { encrypt, decrypt } from "./crypto";
 import { EventBusSingleton as EventBus } from "light-event-bus";
 import * as errors from "./errors";

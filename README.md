@@ -1,91 +1,53 @@
-*Looking for a shareable component template? Go here --> [sveltejs/component-template](https://github.com/sveltejs/component-template)*
+# Buddy Chess Utopia
 
----
+## A friendly place for your bughouse chess needs
 
-# svelte app
+![Buddy Chess Utopia screenshot](./public/front/screenshot.png)
 
-This is a project template for [Svelte](https://svelte.dev) apps. It lives at https://github.com/sveltejs/template.
+### What is this?
 
-To create a new project based on this template using [degit](https://github.com/Rich-Harris/degit):
+Buddy Chess Utopia is a place that lets you and your friends to get together and play some [Bughouse Chess](https://en.wikipedia.org/wiki/Bughouse_chess) online.
 
-```bash
-npx degit sveltejs/template svelte-app
-cd svelte-app
-```
+### What is Bughouse Chess?
 
-*Note that you will need to have [Node.js](https://nodejs.org) installed.*
+Bughouse is the funnest of chess variations (citation not needed).
 
+Breaking the solitary mold of chess, bughouse is a chess variation that let's you team up with a buddy for a fast paced chess game where you use your superior strategy and communication to slip through the cracks of opponents defenses.
 
-## Get started
+![Bughouse being played over the board](./public/front/bughouse_irl.jpg)
 
-Install the dependencies...
+### I'm sold. What are the rules? How is it played?
 
-```bash
-cd svelte-app
-npm install
-```
+Bughouse is usually played in teams of two. In the seating layout, your team mate sits to your side and holds the same color pieces as your opponent.
 
-...then start [Rollup](https://rollupjs.org):
+![Bughouse layout](./public/front/bughouse_layout.png)
 
-```bash
-npm run dev
-```
+Two main twists are introduced to the usual chess rules.
 
-Navigate to [localhost:5000](http://localhost:5000). You should see your app running. Edit a component file in `src`, save it, and reload the page to see your changes.
+1. All pieces that you capture on your board will be passed to your team mate. You can think of it as these pieces go to your team mate's spare piece stash.
+2. On your turn you can drop a piece from your spare stash on to your board (Pawns cannot be dropped on the first or last rank).
 
-By default, the server will only respond to requests from localhost. To allow connections from other computers, edit the `sirv` commands in package.json to include the option `--host 0.0.0.0`.
+That's pretty much it. Read more thoroughly about Bughouse on [Wikipedia](https://en.wikipedia.org/wiki/Bughouse_chess).
 
+### Why Buddy Chess Utopia?
 
-## Building and running in production mode
+- There is no logins, no accounts. You create a room, share the link and start playing.
+- No central servers.
+- No tracking.
 
-To create an optimised version of the app:
+### And what's with the Utopia?
 
-```bash
-npm run build
-```
+There is no anti cheat mechanisms. We assume all players are good citizens in our utopia.
 
-You can run the newly built app with `npm run start`. This uses [sirv](https://github.com/lukeed/sirv), which is included in your package.json's `dependencies` so that the app will work when you deploy to platforms like [Heroku](https://heroku.com).
+### How is it implemented?
 
+The source of code this implementation is out in the wild: https://github.com/sransara/buddy-chess-utopia
 
-## Single-page app mode
+Standing on the shoulders of giants:
 
-By default, sirv will only respond to requests that match files in `public`. This is to maximise compatibility with static fileservers, allowing you to deploy your app anywhere.
-
-If you're building a single-page app (SPA) with multiple routes, sirv needs to be able to respond to requests for *any* path. You can make it so by editing the `"start"` command in package.json:
-
-```js
-"start": "sirv public --single"
-```
-
-
-## Deploying to the web
-
-### With [Vercel](https://vercel.com)
-
-Install `vercel` if you haven't already:
-
-```bash
-npm install -g vercel
-```
-
-Then, from within your project folder:
-
-```bash
-cd public
-vercel deploy --name my-project
-```
-
-### With [surge](https://surge.sh/)
-
-Install `surge` if you haven't already:
-
-```bash
-npm install -g surge
-```
-
-Then, from within your project folder:
-
-```bash
-npm run build
-surge public my-project.surge.sh
-```
+- WebRTC : for P2P - https://github.com/feross/simple-peer
+- Firebase : for discovery and signaling - https://firebase.google.com/
+- Assymetric encryption for public communication - https://github.com/dchest/tweetnacl-js
+- Chessboard - https://github.com/ornicar/chessground/
+- Original chess rules - https://github.com/jhlywa/chess.js/
+- frontend - Svelte and Tailwind

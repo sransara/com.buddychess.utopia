@@ -52,8 +52,8 @@
 </style>
 
 <div
-  transition:fade
-  class="absolute left-0 bg-white items-center justify-center z-50 max-h-full flex overflow-auto"
+  out:fade
+  class="absolute left-0 bg-white items-center justify-center z-50 flex overflow-auto"
   style="min-height: 24rem; height: calc(100vh - 5rem); min-width: 60rem; width: 80vw;"
 >
   <div class="flex flex-col">
@@ -106,7 +106,6 @@
     </div>
   </div>
   <div class="flex flex-col">
-    <div class="flex w-32 h-24"></div>
     <div class="flex w-32 h-32 items-center justify-center text-4xl font-serif">&amp;</div>
     <div class="flex w-32 h-32 items-center justify-center text-6xl font-serif">vs</div>
     <div class="flex w-32 h-32 items-center justify-center text-4xl font-serif">&amp;</div>

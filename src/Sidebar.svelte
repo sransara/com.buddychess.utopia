@@ -3,7 +3,7 @@
   import { replace } from "svelte-spa-router";
   import Avatar from "./components/Avatar/index.svelte";
   import { EventBusSingleton as EventBus } from "light-event-bus";
-  import { roomId$, playerId$, spots$, wizard$ } from "./common/datastore";
+  import { roomId$, playerId$, gamen$, spots$, wizard$ } from "./common/datastore";
   import * as msgbus from "./common/msgbus";
   import * as global from "./common/dataglobal";
   import * as wizard from "./common/wizard";
@@ -91,6 +91,8 @@
   }
 
   function rematch() {
+    if (!wizard.isIn($wizard$, wizard.steps.END_GAME)) return;
+
     $wizard$ = wizard.todo(wizard.steps.WAIT_FOR_SPOTS);
     if ($playerId$ == "host") {
       replace(`/room/create/${$roomId$}`);
@@ -156,7 +158,9 @@
           <div>
             Rematch?
             <button
-              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-1 rounded focus:outline-none"
+              class="{wizard.isIn($wizard$, wizard.steps.END_GAME) && $gamen$ == msg['gamen'] ? 'bg-blue-500 hover:bg-blue-700 text-white' : 'bg-green-500 text-black'}
+              font-bold py-1 px-1 rounded focus:outline-none"
+              disabled="{!(wizard.isIn($wizard$, wizard.steps.END_GAME) && $gamen$ == msg['gamen'])}"
               on:click="{rematch}"
             >
               Yes
@@ -164,9 +168,7 @@
           </div>
         </div>
       {:else if msg['from'] == 'internal'}
-        <div class="flex mb-1 p-1 rounded-md {getMsgStyleClasses(msg)}">
-          {@html msg['data']}
-        </div>
+        <div class="flex mb-1 p-1 rounded-md {getMsgStyleClasses(msg)}">{msg['data']}</div>
       {/if}
     {/each}
   </div>

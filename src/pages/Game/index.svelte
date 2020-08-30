@@ -266,6 +266,7 @@
         avatar: $spots$[$playerId$]["avatar"],
         team: $spots$[$playerId$]["team"],
       },
+      gamen: $gamen$,
       event: event,
     });
 

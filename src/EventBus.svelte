@@ -77,7 +77,10 @@
             data: "All players synced. Starting new game.",
           });
         }
-      } else if (wizard.isAfter($wizard$, wizard.steps.WAIT_FOR_SPOTS)) {
+      } else if (
+        wizard.isAfter($wizard$, wizard.steps.WAIT_FOR_SPOTS) &&
+        wizard.isBefore($wizard$, wizard.steps.END_GAME)
+      ) {
         if (Object.keys($spots$).length != 4) {
           $wizard$ = wizard.todo(wizard.steps.WAIT_FOR_SPOTS);
           replace(`/room/create/${$roomId$}`);
@@ -140,7 +143,10 @@
             data: "All players synced. Starting new game.",
           });
         }
-      } else if (wizard.isAfter($wizard$, wizard.steps.WAIT_FOR_SPOTS)) {
+      } else if (
+        wizard.isAfter($wizard$, wizard.steps.WAIT_FOR_SPOTS) &&
+        wizard.isBefore($wizard$, wizard.steps.END_GAME)
+      ) {
         if (Object.keys($spots$).length != 4) {
           $wizard$ = wizard.todo(wizard.steps.WAIT_FOR_SPOTS);
           replace(`/room/join/${$roomId$}`);
@@ -249,6 +255,7 @@
           avatar: $spots$[endgame.fromId]["avatar"],
           team: $spots$[endgame.fromId]["team"],
         },
+        gamen: $gamen$,
         event: endgame["event"],
       });
     });

@@ -1,27 +1,32 @@
 <script lang="typescript">
   import { link, location } from "svelte-spa-router";
-  import { _roomId$ } from "./common/datastore";
+  import { _roomId$, _playerId$ } from "./common/datastore";
   import { replace } from "svelte-spa-router";
 </script>
 
-<header
-  class="px-1 py-1 flex bg-gray-800 text-gray-200 text-3xl whitespace-no-wrap w-full overflow-hidden"
-  style="min-width: 75rem;"
->
+<header class="px-1 py-1 flex bg-gray-800 text-gray-200 text-3xl whitespace-no-wrap w-full overflow-hidden">
   <span class="px-1 inline-block hover:text-yellow-600">
     <a class="inline-block" href="/" use:link>&#x2658;Buddy Chess</a>
   </span>
   {#if !$_roomId$}
     <button
       class="px-2 mx-2 inline-block bg-blue-500 hover:bg-blue-700 rounded-md focus:outline-none"
-      on:click="{() => replace('/room/create')}"
+      on:click="{() => {
+        replace('/room/create');
+      }}"
     >
-      Create a room
+      Game room
     </button>
   {:else}
     <button
       class="px-2 mx-2 inline-block bg-blue-500 hover:bg-blue-700 rounded-md focus:outline-none"
-      on:click="{() => replace('/room/create')}"
+      on:click="{() => {
+        if ($_playerId$ == 'host') {
+          replace(`/room/create/${$_roomId$}`);
+        } else {
+          replace(`/room/join/${$_roomId$}`);
+        }
+      }}"
     >
       Back to game room
     </button>

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "rm -rf public/build; rollup -c",
+    "deploy": "npm run build; firebase deploy",
     "dev": "rollup -c -w",
     "start": "sirv public"
   },

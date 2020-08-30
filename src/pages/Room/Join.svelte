@@ -285,7 +285,9 @@
           <div class="w-full text-base">
             {#if wizard.isIn($wizard$, wizard.steps.WAIT_FOR_SPOTS)}
               <div in:fade class="mb-4">
-                <span class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-1">Invitation link</span>
+                <span class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-1">
+                  Copy and share this invitation link
+                </span>
                 <input
                   value="{`${window.location.origin}/#/room/join/${$roomId$}`}"
                   readonly="{true}"

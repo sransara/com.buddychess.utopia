@@ -3,6 +3,15 @@ import { Chess } from "chess.js";
 import * as chtypes from "chess.js";
 import { Api } from "chessground/api";
 
+function cgchpiece(piece: cgtypes.Piece): chtypes.Piece {
+  const chPieceType = piece.role == "knight" ? "n" : piece.role.charAt(0);
+
+  return {
+    type: chPieceType as chtypes.PieceType,
+    color: piece.color.charAt(0) as "w" | "b",
+  };
+}
+
 export function fenNextTurn(fen: cgtypes.FEN): cgtypes.FEN {
   // rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1
   let fenParts = fen.split(" ");
@@ -44,13 +53,7 @@ export function move(chess: chtypes.ChessInstance, src: cgtypes.Key, dest: cgtyp
 
 export function put(chess: chtypes.ChessInstance, piece: cgtypes.Piece, dest: cgtypes.Key): cgtypes.FEN | undefined {
   if (!puts(chess, [piece], [dest as chtypes.Square])) return undefined;
-  chess.put(
-    {
-      type: piece.role.charAt(0) as chtypes.PieceType,
-      color: piece.color.charAt(0) as "w" | "b",
-    },
-    dest as chtypes.Square
-  );
+  chess.put(cgchpiece(piece), dest as chtypes.Square);
   // trick chess.js to change turn after a piece drop
   const newFen = fenNextTurn(chess.fen());
   chess.load(newFen);
@@ -73,13 +76,7 @@ export function puts(chess: chtypes.ChessInstance, pieces: cgtypes.Piece[], squa
       if (piece.role == "pawn" && ["1", "8"].includes(dest.charAt(1))) return false;
       if (!inCheck) return true;
       temp.load(fen);
-      temp.put(
-        {
-          type: piece.role.charAt(0) as chtypes.PieceType,
-          color: piece.color.charAt(0) as "w" | "b",
-        },
-        dest
-      );
+      temp.put(cgchpiece(piece), dest);
       // valid put only if putting the piece removes the check
       return !temp.in_check();
     });

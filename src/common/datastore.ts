@@ -8,7 +8,6 @@ export const playerId$ = writable((undefined as unknown) as string);
 
 export const spots$ = writable({} as any);
 
-export const _gamen$ = writable(0 as number);
 export const gamen$ = writable(0 as number);
 
 import * as wizard from "./wizard";
