@@ -20,17 +20,21 @@
       online.
     </p>
     <h3>What is Bughouse Chess?</h3>
-    <p>Bughouse is the funnest of chess variations (citation not needed).</p>
-    <p>
-      Breaking the solitary mold of chess, bughouse is a chess variation that let's you team up with a buddy for a fast
-      paced chess game where you use your superior strategy and communication to slip through the cracks of opponents
-      defenses.
-    </p>
-    <p>
-      <a target="_blank" rel="noopener noreferrer" href="/front/bughouse_irl.jpg">
-        <img src="/front/bughouse_irl.jpg" alt="Bughouse being played over the board" style="max-width:100%;" />
+    <div class="clearfix">
+      <a class="float-left" target="_blank" rel="noopener noreferrer" href="/front/bughouse_irl.jpg">
+        <img
+          src="/front/bughouse_irl.jpg"
+          alt="Bughouse being played over the board"
+          style="max-width:100%; margin: 0 1em 0 0;"
+        />
       </a>
-    </p>
+      <p>Bughouse is the funnest of chess variations (citation not needed).</p>
+      <p>
+        Breaking the solitary mold of chess, bughouse is a chess variation that let's you team up with a buddy for a
+        fast paced chess game where you use your superior strategy and communication to slip through the cracks of
+        opponents defenses.
+      </p>
+    </div>
     <h3>I'm sold. What are the rules? How is it played?</h3>
     <p>
       Bughouse is usually played in teams of two. In the seating layout, your team mate sits to your side and holds the
@@ -63,6 +67,7 @@
       <li>No central servers.</li>
       <li>No tracking.</li>
     </ul>
+    <p>All the pros are its own cons. Choose responsibly.</p>
     <h3>And what's with the Utopia?</h3>
     <p>There is no anti cheat mechanisms. We assume all players are good citizens in our utopia.</p>
     <h3>How is it implemented?</h3>
