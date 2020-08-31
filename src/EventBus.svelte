@@ -114,6 +114,12 @@
     });
 
     // Room/Join
+    EventBus.subscribe("simplePeerError", async (arg: any) => {
+      if ($playerId$ == "host") return;
+
+      const peerId = arg.peer;
+      if (peerId == "host") return errors.fatal(errors.fatalEnum.PEER_HOST_FIREWALL);
+    });
     EventBus.subscribe("initPeerConnection", async (arg: any) => {
       if ($playerId$ == "host") return;
 
@@ -125,9 +131,7 @@
     EventBus.subscribe("simplePeerClose", (pid: any) => {
       if ($playerId$ == "host") return;
 
-      if (pid == "host") {
-        return errors.fatal(errors.fatalEnum.HOST_DISCONNECTED);
-      }
+      if (pid == "host") return errors.fatal(errors.fatalEnum.HOST_DISCONNECTED);
     });
 
     EventBus.subscribe("updatedSpots", () => {
