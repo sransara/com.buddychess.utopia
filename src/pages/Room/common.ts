@@ -23,6 +23,11 @@ const webrtcConfig = {
     {
       urls: ["stun:stun1.l.google.com:19302"],
     },
+    {
+      urls: "turn:numb.viagenie.ca",
+      username: "hello@bughouse.buzz",
+      credential: "turntables",
+    },
   ],
   iceCandidatePoolSize: 10,
 };
