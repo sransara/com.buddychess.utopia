@@ -123,6 +123,9 @@
 </style>
 
 <div class="flex flex-col p-2 w-full" style="min-height: 24rem; height: calc(100vh - 5rem);">
+  {#if roomChatMsgs.length <= 1}
+    <widgetbot server="778524021628338186" channel="778524975111864361" width="100%" height="90vh"></widgetbot>
+  {:else}
     <div class="bg-gray-800 p-1 rounded-t-md text-white">Chat</div>
     <div bind:this="{roomChatDiv}" class="flex-grow flex flex-col p-2 overflow-y-auto overflow-x-hidden border">
       <div class="flex-grow"></div>
@@ -183,4 +186,11 @@
         Send (Enter)
       </button>
     </div>
+  {/if}
 </div>
+
+<svelte:head>
+  <script src="https://cdn.jsdelivr.net/npm/@widgetbot/html-embed">
+
+  </script>
+</svelte:head>

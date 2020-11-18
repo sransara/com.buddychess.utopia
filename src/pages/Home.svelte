@@ -102,8 +102,7 @@
         Frontend - <a target="_blank" href="https://svelte.dev/">Svelte</a> and <a target="_blank" href="https://tailwindcss.com/">Tailwind</a>
       </li>
       <li>
-        Original chess rules -
-        <a href="https://github.com/jhlywa/chess.js/">https://github.com/jhlywa/chess.js/</a>
+        Embeddings - <a target="_blank" href="https://widgetbot.io/">WidgetBot</a>
       </li>
     </ul>
   </article>
