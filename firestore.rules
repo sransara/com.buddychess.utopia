@@ -4,6 +4,7 @@ service cloud.firestore {
     match /rooms/{room}/msgs/{msg} {
       allow read: if true;
       allow create: if true;
+      allow delete: if true;
     }
   }
 }

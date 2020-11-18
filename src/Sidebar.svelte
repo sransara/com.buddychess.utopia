@@ -123,71 +123,64 @@
 </style>
 
 <div class="flex flex-col p-2 w-full" style="min-height: 24rem; height: calc(100vh - 5rem);">
-  <div class="bg-gray-800 p-1 rounded-t-md text-white">Chat</div>
-  <div bind:this="{roomChatDiv}" class="flex-grow flex flex-col p-2 overflow-y-auto overflow-x-hidden border">
-    <div class="flex-grow"></div>
-    {#each roomChatMsgs as msg}
-      {#if msg['from'] == 'me' || msg['from'] == 'peer'}
-        <div class="flex mb-1 {msg['from'] == 'me' ? 'justify-end' : 'justify-start'}">
-          <div class="w-5/6 flex flex-col p-1 rounded-md {getMsgStyleClasses(msg)}">
-            {#if msg['spot']}
-              <div class="flex justify-start items-center">
-                <span class="h-5 w-5">
-                  <Avatar avatar="{msg['spot']['avatar']}" />
-                </span>
-                <span class="ml-1 font-semibold text-gray-700">{msg['spot']['name']}</span>
-              </div>
-            {/if}
-            <div>{msg['data']}</div>
+    <div class="bg-gray-800 p-1 rounded-t-md text-white">Chat</div>
+    <div bind:this="{roomChatDiv}" class="flex-grow flex flex-col p-2 overflow-y-auto overflow-x-hidden border">
+      <div class="flex-grow"></div>
+      {#each roomChatMsgs as msg}
+        {#if msg['from'] == 'me' || msg['from'] == 'peer'}
+          <div class="flex mb-1 {msg['from'] == 'me' ? 'justify-end' : 'justify-start'}">
+            <div class="w-5/6 flex flex-col p-1 rounded-md {getMsgStyleClasses(msg)}">
+              {#if msg['spot']}
+                <div class="flex justify-start items-center">
+                  <span class="h-5 w-5">
+                    <Avatar avatar="{msg['spot']['avatar']}" />
+                  </span>
+                  <span class="ml-1 font-semibold text-gray-700">{msg['spot']['name']}</span>
+                </div>
+              {/if}
+              <div>{msg['data']}</div>
+            </div>
           </div>
-        </div>
-      {:else if msg['from'] == 'endgame'}
-        <div class="flex my-2 flex-col p-1 rounded-md border-2 {getMsgStyleClasses(msg)}">
-          <div class="mb-1">
-            <span class="h-5 w-5 inline-block float-left">
-              <Avatar avatar="{msg['spot']['avatar']}" />
-            </span>
-            <span class="font-semibold ml-1">{msg['spot']['name']}</span>
-            <span class="ml-1">{msg['event']}.</span>
+        {:else if msg['from'] == 'endgame'}
+          <div class="flex my-2 flex-col p-1 rounded-md border-2 {getMsgStyleClasses(msg)}">
+            <div class="mb-1">
+              <span class="h-5 w-5 inline-block float-left">
+                <Avatar avatar="{msg['spot']['avatar']}" />
+              </span>
+              <span class="font-semibold ml-1">{msg['spot']['name']}</span>
+              <span class="ml-1">{msg['event']}.</span>
+            </div>
+            <div class="mb-1">
+              {#if msg['spot']['team'] == $spots$[$playerId$]['team']}
+                Your team lost this round :(
+              {:else}Your team won this round :){/if}
+            </div>
+            <div>
+              Rematch? <button class="{wizard.isIn($wizard$, wizard.steps.END_GAME) && $gamen$ == msg['gamen'] ? 'bg-blue-500 hover:bg-blue-700 text-white' : 'bg-green-500 text-black'}
+                  font-bold py-1 px-1 rounded focus:outline-none" disabled="{!(wizard.isIn($wizard$, wizard.steps.END_GAME) && $gamen$ == msg['gamen'])}" on:click="{rematch}"> Yes </button>
+            </div>
           </div>
-          <div class="mb-1">
-            {#if msg['spot']['team'] == $spots$[$playerId$]['team']}
-              Your team lost this round :(
-            {:else}Your team won this round :){/if}
-          </div>
-          <div>
-            Rematch?
-            <button
-              class="{wizard.isIn($wizard$, wizard.steps.END_GAME) && $gamen$ == msg['gamen'] ? 'bg-blue-500 hover:bg-blue-700 text-white' : 'bg-green-500 text-black'}
-              font-bold py-1 px-1 rounded focus:outline-none"
-              disabled="{!(wizard.isIn($wizard$, wizard.steps.END_GAME) && $gamen$ == msg['gamen'])}"
-              on:click="{rematch}"
-            >
-              Yes
-            </button>
-          </div>
-        </div>
-      {:else if msg['from'] == 'internal'}
-        <div class="flex mb-1 p-1 rounded-md {getMsgStyleClasses(msg)}">{msg['data']}</div>
-      {/if}
-    {/each}
-  </div>
-  <div class="flex flex-col border-r border-l border-b border-4 p-2 bg-gray-100">
-    <input
-      type="text"
-      bind:value="{roomChatMsg}"
-      maxlength="{60}"
-      class="my-1 p-1 resize-none border border-black"
-      placeholder="Type a message to broadcast to your room"
-      on:keydown="{(e) => {
-        if (e.key === 'Enter') sendRoomChat();
-      }}"
-    />
-    <button
-      class="my-1 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-1 rounded focus:outline-none"
-      on:click="{sendRoomChat}"
-    >
-      Send (Enter)
-    </button>
-  </div>
+        {:else if msg['from'] == 'internal'}
+          <div class="flex mb-1 p-1 rounded-md {getMsgStyleClasses(msg)}">{msg['data']}</div>
+        {/if}
+      {/each}
+    </div>
+    <div class="flex flex-col border-r border-l border-b border-4 p-2 bg-gray-100">
+      <input
+        type="text"
+        bind:value="{roomChatMsg}"
+        maxlength="{60}"
+        class="my-1 p-1 resize-none border border-black"
+        placeholder="Type a message to broadcast to your room"
+        on:keydown="{(e) => {
+          if (e.key === 'Enter') sendRoomChat();
+        }}"
+      />
+      <button
+        class="my-1 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-1 rounded focus:outline-none"
+        on:click="{sendRoomChat}"
+      >
+        Send (Enter)
+      </button>
+    </div>
 </div>

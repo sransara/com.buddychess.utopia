@@ -23,6 +23,7 @@ export function firestoreListen(roomId: string, toId: string, toSecretKey: Uint8
           if (change.type === "added") {
             const msg = change.doc.data();
             msg["payload"] = JSON.parse(decrypt(toSecretKey, msg["payload"]));
+            change.doc.ref.delete();
             EventBus.publish(msg.method, msg);
           }
         });

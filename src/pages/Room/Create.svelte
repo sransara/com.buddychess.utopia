@@ -59,7 +59,7 @@
       }
       let json = await response.json();
       $_roomId$ = json.name;
-
+      
       global.players[$_playerId$] = { publicKey: myPublicKey };
 
       $playerId$ = $_playerId$;

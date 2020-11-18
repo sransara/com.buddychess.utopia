@@ -295,6 +295,7 @@
                   p-1 font-mono leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                   type="text"
                   on:click="{(e) => {
+                    if (e == null || e.target == null) return;
                     e.target.focus();
                     e.target.select();
                   }}"

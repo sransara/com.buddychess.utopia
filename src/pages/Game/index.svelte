@@ -67,8 +67,8 @@
     let nextW = (nextH * currentW) / currentH;
     const windowWidth = Math.max(window.innerWidth, utils.convertRemToPixels(75));
     const maxW = (windowWidth * 4) / 5 - 15;
-    nextW = Math.min(nextW, maxW);
-    buddyChessground.style.width = `${Math.floor(nextW)}px`;
+    nextW = Math.floor(Math.min(nextW, maxW));
+    buddyChessground.style.width = `${nextW - (nextW % 8) + 2}px`;
   }
 
   onMount(async () => {
@@ -123,6 +123,9 @@
     viewOnly: true,
   };
 
+  let bPreMove: [cgtypes.Key, cgtypes.Key] | undefined = undefined;
+  let bPreDrop: [cgtypes.Role, cgtypes.Key] | undefined = undefined;
+
   const bChessgroundConfig: Config = {
     orientation: myColor,
     movable: {
@@ -137,10 +140,18 @@
       showGhost: true,
     },
     premovable: {
-      enabled: false,
+      enabled: true,
+      events: {
+        set: (orig: cgtypes.Key, dest: cgtypes.Key) => (bPreMove = [orig, dest]),
+        unset: () => (bPreMove = undefined),
+      },
     },
     predroppable: {
-      enabled: false,
+      enabled: true,
+      events: {
+        set: (role: cgtypes.Role, key: cgtypes.Key) => (bPreDrop = [role, key]),
+        unset: () => (bPreDrop = undefined),
+      },
     },
   };
 
@@ -295,9 +306,16 @@
     if (abcg != "b") return;
     if (interactive != turnColor) return;
 
-    if (!chessx.inCrazyCheckmate(chess, $crazy$[seating[abcg][interactive]]["spares"])) return;
-    // checkmated
-    endGame("got checkmated");
+    if (chessx.inCrazyCheckmate(chess, $crazy$[seating[abcg][interactive]]["spares"])) {
+      // checkmated
+      endGame("got checkmated");
+    } else if (bPreMove) {
+      cg.playPremove();
+    } else if (bPreDrop) {
+      cg.playPredrop((drop: cgtypes.Drop) => {
+        return chess.get(drop.key as chtypes.Square) == null;
+      });
+    }
   }
 
   $: if (aChessground) {
@@ -327,14 +345,16 @@
             const newFEN = chessx.move(bChess, orig, dest);
             if (!newFEN) {
               loadState(bChessground, bChess, $bcg$, "b", false);
-              return;
+              return false;
             }
+
+            let captured = metadata.captured;
 
             $bcg$["fen"] = newFEN;
             $bcg$["lastMove"] = [orig as chtypes.Square, dest as chtypes.Square];
             $bcg$ = $bcg$;
 
-            if (metadata.captured) $crazy$[buddyId]["spares"][metadata.captured.role] += 1;
+            if (captured) $crazy$[buddyId]["spares"][captured.role] += 1;
             $crazy$[myId]["spares"]["dropType"] = undefined;
             $crazy$[myId]["spares"]["dropRole"] = undefined;
             $crazy$[opId]["spares"]["dropType"] = undefined;
@@ -349,16 +369,18 @@
               fromId: myId,
               fen: newFEN,
               lastMove: [orig, dest],
-              spare: metadata.captured ? metadata.captured.role : undefined,
+              spare: captured ? captured.role : undefined,
               clock: $crazy$[myId]["clock"],
             });
+
+            return true;
           },
           afterNewPiece: (role: cgtypes.Role, dest: cgtypes.Key, metadata: cgtypes.MoveMetadata) => {
             const color = bChess.turn() == "w" ? "white" : "black";
             const newFEN = chessx.put(bChess, { role: role, color: color }, dest);
             if (!newFEN) {
               loadState(bChessground, bChess, $bcg$, "b", false);
-              return;
+              return false;
             }
 
             $bcg$["fen"] = newFEN;
@@ -383,6 +405,8 @@
               spare: role,
               clock: $crazy$[myId]["clock"],
             });
+
+            return true;
           },
         },
       },
@@ -413,14 +437,14 @@
 
 {#if visibleSplash}
   <Splash
-    {myColor}
-    {opColor}
-    {myId}
-    {opId}
-    {buddyColor}
-    {buddyId}
-    {opBuddyColor}
-    {opBuddyId}
+    myColor="{myColor}"
+    opColor="{opColor}"
+    myId="{myId}"
+    opId="{opId}"
+    buddyColor="{buddyColor}"
+    buddyId="{buddyId}"
+    opBuddyColor="{opBuddyColor}"
+    opBuddyId="{opBuddyId}"
     on:waitForGame="{waitForGame}"
   />
 {/if}
@@ -429,8 +453,8 @@
     <BuddyChessground
       bind:buddyChessground
       bind:aChessground
-      {aChessgroundConfig}
-      {aInteractive}
+      aChessgroundConfig="{aChessgroundConfig}"
+      aInteractive="{aInteractive}"
       aWhiteName="{utils.getAttr($spots$, [seating['a']['white'], 'name'])}"
       aWhiteAvatar="{utils.getAttr($spots$, [seating['a']['white'], 'avatar'])}"
       aWhiteTeam="{utils.getAttr($spots$, [seating['a']['white'], 'team'])}"
@@ -442,8 +466,8 @@
       aBlackClock="{utils.getAttr($crazy$, [seating['a']['black'], 'clock'])}"
       aBlackSpares="{utils.getAttr($crazy$, [seating['a']['black'], 'spares'])}"
       bind:bChessground
-      {bChessgroundConfig}
-      {bInteractive}
+      bChessgroundConfig="{bChessgroundConfig}"
+      bInteractive="{bInteractive}"
       bWhiteName="{utils.getAttr($spots$, [seating['b']['white'], 'name'])}"
       bWhiteAvatar="{utils.getAttr($spots$, [seating['b']['white'], 'avatar'])}"
       bWhiteTeam="{utils.getAttr($spots$, [seating['b']['white'], 'team'])}"

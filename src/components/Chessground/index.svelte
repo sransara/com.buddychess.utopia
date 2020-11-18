@@ -17,6 +17,7 @@
   };
 
   let cgdiv: any;
+
   onMount(() => {
     chessground = Chessground(cgdiv, { ...defaultConfig, ...config });
   });

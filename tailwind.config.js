@@ -13,7 +13,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Roboto", ...defaultTheme.fontFamily.sans],
+        sans: ["Source Sans Pro", ...defaultTheme.fontFamily.sans],
         mono: ["Source Code Pro", ...defaultTheme.fontFamily.sans],
       },
       padding: {

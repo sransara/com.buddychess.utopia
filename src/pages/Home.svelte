@@ -4,8 +4,20 @@
 
 <div in:fade class="flex flex-col justify-center items-center my-4 mx-4">
   <article class="prose">
-    <h1>Buddy Chess Utopia</h1>
-    <h2>A friendly place for your bughouse chess needs</h2>
+    <h1 style="margin-bottom: 0.5em;">Buddy Chess Utopia</h1>
+    <h2 style="margin-top: 0.5em;">A friendly place for your bughouse chess needs</h2>
+    <h3>What is this?</h3>
+    <p>
+      Buddy Chess Utopia is a decentralized server that lets you and your friends to get together and play <a
+        target="_blank"
+        href="https://en.wikipedia.org/wiki/Bughouse_chess"
+        rel="nofollow"
+      >bughouse chess</a>.
+    </p>
+    <h3>How to start a game?</h3>
+    <ol>
+      <li>There is no logins, no accounts. You create a room, share the link and start playing.</li>
+    </ol>
   </article>
   <p class="my-10">
     <a target="_blank" rel="noopener noreferrer" href="/front/screenshot_full.png">
@@ -13,12 +25,15 @@
     </a>
   </p>
   <article class="prose">
-    <h3>What is this?</h3>
-    <p>
-      Buddy Chess Utopia is a place that lets you and your friends to get together and play some
-      <a href="https://en.wikipedia.org/wiki/Bughouse_chess" rel="nofollow">Bughouse Chess</a>
-      online.
-    </p>
+    <h3>Why Buddy Chess Utopia?</h3>
+    <ul>
+      <li>There are no logins, no accounts. You create a room, share the link and start playing.</li>
+      <li>No central servers.</li>
+      <li>No tracking.</li>
+    </ul>
+    <p>All the pros are its own cons. Choose responsibly.</p>
+    <h3>And what's with the Utopia?</h3>
+    <p>There is no anti cheat mechanisms. We assume all players are good citizens in our utopia.</p>
     <h3>What is Bughouse Chess?</h3>
     <div class="clearfix">
       <a class="float-left" target="_blank" rel="noopener noreferrer" href="/front/bughouse_irl.jpg">
@@ -57,47 +72,39 @@
       </li>
     </ol>
     <p>
-      That's pretty much it. Read more thoroughly about Bughouse on
-      <a href="https://en.wikipedia.org/wiki/Bughouse_chess" rel="nofollow">Wikipedia</a>
-      .
+      That's pretty much it. Read more thoroughly about Bughouse on <a
+        href="https://en.wikipedia.org/wiki/Bughouse_chess"
+        rel="nofollow"
+      >Wikipedia</a> .
     </p>
-    <h3>Why Buddy Chess Utopia?</h3>
-    <ul>
-      <li>There is no logins, no accounts. You create a room, share the link and start playing.</li>
-      <li>No central servers.</li>
-      <li>No tracking.</li>
-    </ul>
-    <p>All the pros are its own cons. Choose responsibly.</p>
-    <h3>And what's with the Utopia?</h3>
-    <p>There is no anti cheat mechanisms. We assume all players are good citizens in our utopia.</p>
-    <h3>How is it implemented?</h3>
+    <h3>How is this implemented?</h3>
     <p>
-      The source of code this implementation is out in the wild:
-      <a href="https://github.com/sransara/buddy-chess-utopia">https://github.com/sransara/buddy-chess-utopia</a>
+      The source of code this implementation is out in the wild: <a href="https://github.com/sransara/buddy-chess-utopia">https://github.com/sransara/buddy-chess-utopia</a>
     </p>
     <p>Standing on the shoulders of giants:</p>
     <ul>
       <li>
-        WebRTC : for P2P -
-        <a href="https://github.com/feross/simple-peer">https://github.com/feross/simple-peer</a>
+        WebRTC : for P2P - <a target="_blank" href="https://github.com/feross/simple-peer">https://github.com/feross/simple-peer</a>
       </li>
       <li>
-        Firebase : for discovery and signaling -
-        <a href="https://firebase.google.com/" rel="nofollow">https://firebase.google.com/</a>
+        Firebase : for discovery and signaling - <a target="_blank" href="https://firebase.google.com/" rel="nofollow">https://firebase.google.com/</a>
       </li>
       <li>
-        Assymetric encryption for public communication -
-        <a href="https://github.com/dchest/tweetnacl-js">https://github.com/dchest/tweetnacl-js</a>
+        Assymetric encryption for public communication - <a target="_blank" href="https://github.com/dchest/tweetnacl-js">https://github.com/dchest/tweetnacl-js</a>
       </li>
       <li>
-        Chessboard -
-        <a href="https://github.com/ornicar/chessground/">https://github.com/ornicar/chessground/</a>
+        Chessboard - <a target="_blank" href="https://github.com/ornicar/chessground/">https://github.com/ornicar/chessground/</a>
+      </li>
+      <li>
+        Original chess rules - <a target="_blank" href="https://github.com/jhlywa/chess.js/">https://github.com/jhlywa/chess.js/</a>
+      </li>
+      <li>
+        Frontend - <a target="_blank" href="https://svelte.dev/">Svelte</a> and <a target="_blank" href="https://tailwindcss.com/">Tailwind</a>
       </li>
       <li>
         Original chess rules -
         <a href="https://github.com/jhlywa/chess.js/">https://github.com/jhlywa/chess.js/</a>
       </li>
-      <li>Frontend - Svelte and Tailwind</li>
     </ul>
   </article>
 </div>

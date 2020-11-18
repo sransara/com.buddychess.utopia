@@ -1,6 +1,5 @@
 <script lang="typescript">
   import GlobalStyles from "./components/GlobalStyles.svelte";
-  import GithubCorner from "./components/GithubCorner.svelte";
   import Router from "svelte-spa-router";
   import { routes } from "./routes";
   import Navbar from "./Navbar.svelte";
@@ -20,8 +19,6 @@
 <EventBus />
 <div class="flex flex-col" style="min-width: 75rem;">
   <Navbar />
-  <GithubCorner url="https://github.com/sransara/buddy-chess-utopia" />
-
   <div class="flex" style="min-height: 24rem;">
     <div class="w-4/5">
       <Router {routes} on:routeLoaded="{routeLoaded}" />

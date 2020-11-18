@@ -5,11 +5,24 @@ import { Api } from "chessground/api";
 
 function cgchpiece(piece: cgtypes.Piece): chtypes.Piece {
   const chPieceType = piece.role == "knight" ? "n" : piece.role.charAt(0);
-
   return {
     type: chPieceType as chtypes.PieceType,
     color: piece.color.charAt(0) as "w" | "b",
   };
+}
+
+function chcgpiece(piece: chtypes.Piece): cgtypes.Piece {
+  const color = piece.color == "w" ? "white" : "black"
+  let role = {
+    "p": "pawn",
+    "b": "bishop",
+    "n": "knight",
+    "r": "rook",
+    "q": "queen",
+    "k": "king"
+  }[piece.type] as cgtypes.Role
+
+  return { role, color }
 }
 
 export function fenNextTurn(fen: cgtypes.FEN): cgtypes.FEN {
