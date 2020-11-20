@@ -59,7 +59,7 @@
       }
       let json = await response.json();
       $_roomId$ = json.name;
-      
+
       global.players[$_playerId$] = { publicKey: myPublicKey };
 
       $playerId$ = $_playerId$;
@@ -175,17 +175,12 @@
           </button>
         </td>
       {:else if wizard.isIn($wizard$, wizard.steps.CREATE_OR_JOIN_ROOM_SPACE, 'doing')}
-        <td in:fade>
-          <span class="loading">Creating a room</span>
-        </td>
+        <td in:fade><span class="loading">Creating a room</span></td>
       {:else if wizard.isAfter($wizard$, wizard.steps.CREATE_OR_JOIN_ROOM_SPACE)}
         <td in:fade>
           Created room
           <ul class="text-base text-gray-700">
-            <li>
-              Room ID:
-              <code>{$roomId$}</code>
-            </li>
+            <li>Room ID: <code>{$roomId$}</code></li>
           </ul>
         </td>
       {/if}
@@ -209,7 +204,7 @@
             <div class="w-full">
               <button
                 class="{wizard.isIn($wizard$, wizard.steps.SAVE_SPOT, 'doing') ? 'bg-gray-700' : 'bg-blue-500 hover:bg-blue-600'}
-                text-white text-xl px-4 focus:outline-none rounded-lg"
+                  text-white text-xl px-4 focus:outline-none rounded-lg"
                 disabled="{wizard.isIn($wizard$, wizard.steps.SAVE_SPOT, 'doing')}"
                 on:click="{markYourSpot}"
               >
@@ -249,7 +244,7 @@
                   value="{`${window.location.origin}/#/room/join/${$roomId$}`}"
                   readonly="{true}"
                   class="appearance-none block w-full bg-gray-200 text-gray-700 text-sm border border-gray-200 rounded
-                  p-1 font-mono leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                    p-1 font-mono leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                   type="text"
                   on:click="{(e) => {
                     e.target.focus();
@@ -280,7 +275,7 @@
                   {#if pid != $playerId$}
                     <button
                       class="bg-blue-500 hover:bg-blue-700 text-white text-xs px-2 py-1 ml-2 rounded-sm
-                      focus:outline-none"
+                        focus:outline-none"
                       on:click="{() => peerConnectionCleanup(global.players, pid)}"
                     >
                       kick

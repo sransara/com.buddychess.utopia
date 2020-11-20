@@ -2,6 +2,7 @@ import firebase from "firebase/app";
 import { encrypt, decrypt } from "./crypto";
 import { EventBusSingleton as EventBus } from "light-event-bus";
 import * as errors from "./errors";
+import LZString from "lz-string";
 
 let firestoreUnsubscriber: any;
 
@@ -13,16 +14,15 @@ export function firestoreListen(roomId: string, toId: string, toSecretKey: Uint8
   firestoreUnsubscribe();
   firestoreUnsubscriber = firebase
     .firestore()
-    .collection("rooms")
-    .doc(roomId)
-    .collection("msgs")
+    .collection(`/rooms/${roomId}/msgs`)
     .where("to", "==", toId)
     .onSnapshot(
       (snapshot) => {
         snapshot.docChanges().forEach(function (change) {
           if (change.type === "added") {
             const msg = change.doc.data();
-            msg["payload"] = JSON.parse(decrypt(toSecretKey, msg["payload"]));
+            // msg["payload"] = JSON.parse(decrypt(toSecretKey, msg["payload"]));
+            msg["payload"] = JSON.parse(decrypt(toSecretKey, LZString.decompressFromUTF16(msg["payload"]) || ""));
             change.doc.ref.delete();
             EventBus.publish(msg.method, msg);
           }
@@ -46,14 +46,13 @@ function firestoreSend(
   if (fromId == toId) return;
   firebase
     .firestore()
-    .collection("rooms")
-    .doc(roomId)
-    .collection("msgs")
+    .collection(`/rooms/${roomId}/msgs`)
     .add({
       from: fromId,
       to: toId,
       method: method,
-      payload: encrypt(toPublicKey, JSON.stringify(payload)),
+      // payload: encrypt(toPublicKey, JSON.stringify(payload)),
+      payload: LZString.compressToUTF16(encrypt(toPublicKey, JSON.stringify(payload))),
     })
     .catch((err) => {
       console.log(err);

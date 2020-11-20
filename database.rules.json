@@ -1,6 +1,7 @@
 {
   "rules": {
     "rooms": {
+      ".indexOn": ["createdAt"],
       "$room": {
         ".read": true,
         ".write": true

@@ -17,6 +17,16 @@
     >
       Game room
     </button>
+  {:else if $location.startsWith('/room')}
+    <button
+      class="px-2 mx-2 inline-block bg-blue-500 hover:bg-blue-700 rounded-md focus:outline-none"
+      on:click="{() => {
+        window.location.hash = '/';
+        window.location.reload();
+      }}"
+    >
+      Leave this game room
+    </button>
   {:else}
     <button
       class="px-2 mx-2 inline-block bg-blue-500 hover:bg-blue-700 rounded-md focus:outline-none"
@@ -29,15 +39,6 @@
       }}"
     >
       Back to game room
-    </button>
-    <button
-      class="px-2 mx-2 inline-block bg-blue-500 hover:bg-blue-700 rounded-md focus:outline-none"
-      on:click="{() => {
-        window.location.hash = '/';
-        window.location.reload();
-      }}"
-    >
-      Leave this game room
     </button>
   {/if}
 </header>

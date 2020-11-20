@@ -26,68 +26,25 @@
       <li>Collect 4 players.</li>
       <li>Start playing and enjoy!</li>
     </ol>
-    <div class="bg-yellow-300 rounded-lg p-2">
-      <h3 style="margin-top: 0;">Bugs and future bugs</h3>
-      <p>
-        We certainly got bugs in the house. Feel free to report any stragglers in our <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://discord.com/channels/778524021628338186/778721767429898281"
-        >
-          discord bug-reports channel</a>. We can talk about adding new bugs (features) over there as well. <a
-          href="https://ko-fi.com/sransara"
-        >A supportive coffee</a> for this bug driven development will be much appreciated. Complete revamp with better mobile
-        interface and community support is being brewed as we speak.
-      </p>
-      <div>
-        <!-- Begin Mailchimp Signup Form -->
-        <link href="//cdn-images.mailchimp.com/embedcode/horizontal-slim-10_7.css" rel="stylesheet" type="text/css" />
-        <style type="text/css">
-          #mc_embed_signup {
-            clear: left;
-            font: 14px Helvetica, Arial, sans-serif;
-            width: 100%;
-          }
-
-          #mc_embed_signup form {
-            text-align: left;
-          }
-        </style>
-        <div id="mc_embed_signup">
-          <form
-            action="https://gmail.us7.list-manage.com/subscribe/post?u=443bac934c502ed3012816fce&id=ddea23b83e"
-            method="post"
-            id="mc-embedded-subscribe-form"
-            name="mc-embedded-subscribe-form"
-            class="validate"
-            target="_blank"
-            novalidate
-          >
-            <div id="mc_embed_signup_scroll">
-              <label for="mce-EMAIL">Sign up here to stay alert for the next update</label>
-              <input
-                type="email"
-                value=""
-                name="EMAIL"
-                class="email"
-                id="mce-EMAIL"
-                placeholder="email address"
-                required
-              />
-              <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-              <div style="position: absolute; left: -5000px;" aria-hidden="true">
-                <input type="text" name="b_443bac934c502ed3012816fce_ddea23b83e" tabindex="-1" value="" />
-              </div>
-              <div class="clear">
-                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button" />
-              </div>
-            </div>
-            <span class="block mt-1 text-xs"><i>I promise I will not resell your email.</i></span>
-          </form>
-        </div>
-        <!--End mc_embed_signup-->
-      </div>
-    </div>
+    <h3 style="margin-top: 0;">Bugs and future bugs</h3>
+    <p>
+      We certainly got bugs in the house. Feel free to report any stragglers in our <a
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://discord.com/channels/778524021628338186/778721767429898281"
+      >
+        discord bug-reports channel</a>. We can talk about adding new bugs (features) over there as well. <a
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://ko-fi.com/sransara"
+      >A supportive coffee</a> for this bug driven development will be much appreciated. Revamp with better mobile interface
+      is <a target="_blank" href="https://github.com/sransara/buddy-chess-utopia">being brewed</a> as we speak. As I'm chugging
+      along in my spare time, there will be no promises on the timeline. <a
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://docs.google.com/forms/d/e/1FAIpQLSeHoTQ7JBww-fqRIXnynVbX6G_DQoLNXbSHo6Q5NEboNsIzUQ/viewform?usp=sf_link"
+      >Subscribe here</a> to stay upto date.
+    </p>
   </article>
   <p class="my-10">
     <a target="_blank" rel="noopener noreferrer" href="/front/screenshot_full.png">
