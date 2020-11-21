@@ -17,7 +17,7 @@
     >
       Game room
     </button>
-  {:else if $location.startsWith('/room')}
+  {:else if $location.startsWith('/room') || $location.startsWith('/game')}
     <button
       class="px-2 mx-2 inline-block bg-blue-500 hover:bg-blue-700 rounded-md focus:outline-none"
       on:click="{() => {

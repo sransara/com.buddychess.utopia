@@ -53,7 +53,7 @@
 </script>
 
 <div bind:this="{buddyChessground}" class="flex select-none px-2" style="width: 50vw;">
-  <div class="w-1/2 inline-block {aInteractive ? 'cursor-pointer' : 'cursor-default'}" style="margin-right: 1px;">
+  <div class="w-1/2 inline-block {aInteractive ? 'cursor-pointer' : 'cursor-default'}" style="margin-right: 4px;">
     <CrazyChessground
       bind:chessground="{aChessground}"
       chessgroundConfig="{aChessgroundConfig}"
@@ -70,7 +70,7 @@
       blackSpares="{aBlackSpares}"
     />
   </div>
-  <div class="w-1/2 inline-block {bInteractive ? 'cursor-pointer' : 'cursor-default'}" style="margin-left: 1px;">
+  <div class="w-1/2 inline-block {bInteractive ? 'cursor-pointer' : 'cursor-default'}" style="margin-left: 4px;">
     <CrazyChessground
       bind:chessground="{bChessground}"
       chessgroundConfig="{bChessgroundConfig}"
