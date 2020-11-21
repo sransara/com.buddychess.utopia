@@ -29,10 +29,10 @@
     <h3 style="margin-top: 0;">Bugs and future bugs</h3>
     <p>
       We certainly got bugs in the house. Feel free to report any stragglers in our <a
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://discord.com/channels/778524021628338186/778721767429898281"
-      >
+      target="_blank"
+      rel="noopener noreferrer"
+      href="https://discord.gg/Wnt7TDVzEe"
+    >
         discord bug-reports channel</a>. We can talk about adding new bugs (features) over there as well. <a
         target="_blank"
         rel="noopener noreferrer"
