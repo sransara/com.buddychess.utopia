@@ -1,5 +1,5 @@
 <script lang="typescript">
-  import GlobalStyles from "./components/GlobalStyles.svelte";
+  import "./components/GlobalStyles.svelte";
   import Router from "svelte-spa-router";
   import { routes } from "./routes";
   import Navbar from "./Navbar.svelte";
@@ -13,7 +13,7 @@
 </script>
 
 <svelte:head>
-  <title>Buddy Chess: {currentRoute.title}</title>
+  <title>Buddy Chess: {currentRoute.title} - Your friendly bughouse server</title>
 </svelte:head>
 
 <EventBus />
@@ -21,7 +21,7 @@
   <Navbar />
   <div class="flex" style="min-height: 24rem;">
     <div class="w-4/5">
-      <Router {routes} on:routeLoaded="{routeLoaded}" />
+      <Router routes="{routes}" on:routeLoaded="{routeLoaded}" />
     </div>
     <div class="w-1/5">
       <Sidebar />
