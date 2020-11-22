@@ -194,10 +194,7 @@
       {#if wizard.isBefore($wizard$, wizard.steps.CREATE_OR_JOIN_ROOM_SPACE)}
         <td in:fade>
           Join room queue
-          <p class="text-base text-gray-700">
-            Room ID:
-            <code>{params.id}</code>
-          </p>
+          <p class="text-base text-gray-700">Room ID: <code>{params.id}</code></p>
         </td>
       {:else if wizard.isIn($wizard$, wizard.steps.CREATE_OR_JOIN_ROOM_SPACE, 'todo')}
         <td in:fade>
@@ -207,18 +204,14 @@
           >
             Join room queue
           </button>
-          <p class="text-base text-gray-700">
-            Room ID:
-            <code>{params.id}</code>
-          </p>
+          <p class="text-base text-gray-700">Room ID: <code>{params.id}</code></p>
         </td>
       {:else if wizard.isIn($wizard$, wizard.steps.CREATE_OR_JOIN_ROOM_SPACE, 'doing')}
         <td in:fade>
           <span class="loading">Joining room queue</span>
           <p class="text-base text-gray-700"></p>
           <p class="text-base text-gray-700">
-            Room ID:
-            <code>{params.id}</code>
+            Room ID: <code>{params.id}</code>
             <br />
             <strong>Connecting to room host</strong>
           </p>
@@ -226,10 +219,7 @@
       {:else if wizard.isAfter($wizard$, wizard.steps.CREATE_OR_JOIN_ROOM_SPACE)}
         <td in:fade>
           Joined room queue
-          <p class="text-base text-gray-700">
-            Room ID:
-            <code>{params.id}</code>
-          </p>
+          <p class="text-base text-gray-700">Room ID: <code>{params.id}</code></p>
         </td>
       {/if}
     </tr>
@@ -252,7 +242,7 @@
             <div class="w-full">
               <button
                 class="{wizard.isIn($wizard$, wizard.steps.SAVE_SPOT, 'doing') ? 'bg-gray-700' : 'bg-blue-500 hover:bg-blue-600'}
-                text-white text-xl px-4 focus:outline-none rounded-lg"
+                  text-white text-xl px-4 focus:outline-none rounded-lg"
                 disabled="{wizard.isIn($wizard$, wizard.steps.SAVE_SPOT, 'doing')}"
                 on:click="{markYourSpot}"
               >
@@ -285,14 +275,14 @@
           <div class="w-full text-base">
             {#if wizard.isIn($wizard$, wizard.steps.WAIT_FOR_SPOTS)}
               <div in:fade class="mb-4">
-                <span class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-1">
-                  Copy and share this invitation link
+                <span class="block p-1 tracking-wide text-gray-700 text-sm font-bold mb-1 bg-orange-300">
+                  Share this invitation link
                 </span>
                 <input
                   value="{`${window.location.origin}/#/room/join/${$roomId$}`}"
                   readonly="{true}"
-                  class="appearance-none block w-full bg-gray-200 text-gray-700 text-sm border border-gray-200 rounded
-                  p-1 font-mono leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                  class="appearance-none block w-full bg-gray-200 text-gray-700 text-sm border-2 border-orange-300
+                    rounded p-1 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                   type="text"
                   on:click="{(e) => {
                     if (e == null || e.target == null) return;
