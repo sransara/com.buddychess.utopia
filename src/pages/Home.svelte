@@ -3,6 +3,12 @@
   import { link } from "svelte-spa-router";
 </script>
 
+<style>
+  .prose li {
+    margin: 0;
+  }
+</style>
+
 <div in:fade class="flex flex-col justify-center items-center my-4 mx-4">
   <article class="prose">
     <h1 style="margin-bottom: 0.5em;">Buddy Chess Utopia</h1>
@@ -17,34 +23,52 @@
     <ol>
       <li><a href="/room/create" use:link>Create a game room</a></li>
       <li>
-        Share invitation with your buddies. Try in <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://discord.gg/Wnt7TDVzEe"
-        >our discord server</a>.
+        Share invitation with your buddies.
+        <ul style="margin: 0;">
+          <li>
+            Try in <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/uYq5BVqccX">our discord server</a>
+          </li>
+          <li>
+            Or the <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://kiwiirc.com/nextclient/irc.kiwiirc.com/#buddy-chess-utopia"
+            >global chat</a> to the right.
+          </li>
+        </ul>
       </li>
       <li>Collect 4 players.</li>
       <li>Start playing and enjoy!</li>
     </ol>
-    <h3 style="margin-top: 0;">Bugs and future bugs</h3>
-    <p>
-      We certainly got bugs in the house. Feel free to report any stragglers in our <a
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://discord.gg/Wnt7TDVzEe"
-      >
-        discord bug-reports channel</a>. We can talk about adding new bugs (features) over there as well. <a
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://ko-fi.com/sransara"
-      >A supportive coffee</a> for this bug driven development will be much appreciated. Revamp with better mobile interface
-      is <a target="_blank" href="https://github.com/sransara/buddy-chess-utopia">being brewed</a> as we speak. As I'm chugging
-      along in my spare time, there will be no promises on the timeline. <a
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://docs.google.com/forms/d/e/1FAIpQLSeHoTQ7JBww-fqRIXnynVbX6G_DQoLNXbSHo6Q5NEboNsIzUQ/viewform?usp=sf_link"
-      >Subscribe here</a> to stay upto date.
-    </p>
+    <h3 style="margin-top: 0;">Features</h3>
+    <ul style="margin: 0.5em;">
+      <li>No fuss with accounts.</li>
+      <li>No ads. No tracking.</li>
+      <li>Pre-moving.</li>
+      <li>No central server</li>
+      <li>
+        Like what you see? <a target="_blank" rel="noopener noreferrer" href="https://ko-fi.com/sransara">A supportive
+          coffee will be appreciated</a>.
+      </li>
+    </ul>
+    <ul style="margin: 0.5em;">
+      <li><i>Planned:</i> Voice chat</li>
+      <li><i>Planned:</i> Touch friendly UI</li>
+    </ul>
+    <ul style="margin: 0.5em;">
+      <li>
+        See straggler bugs? <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/uYq5BVqccX">Complain
+          in discord</a>.
+      </li>
+      <li>
+        Like what you see? <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://docs.google.com/forms/d/e/1FAIpQLSeHoTQ7JBww-fqRIXnynVbX6G_DQoLNXbSHo6Q5NEboNsIzUQ/viewform?usp=sf_link"
+        >Subscribe to stay upto date</a>.
+      </li>
+      <li>Sauce? <a href="https://github.com/sransara/buddy-chess-utopia">Source at Github</a>.</li>
+    </ul>
   </article>
   <p class="my-10">
     <a target="_blank" rel="noopener noreferrer" href="/front/screenshot_full.png">
@@ -52,15 +76,11 @@
     </a>
   </p>
   <article class="prose">
-    <h3>Why Buddy Chess Utopia?</h3>
-    <ul>
-      <li>There are no logins, no accounts. You create a room, share the link and start playing.</li>
-      <li>No central servers.</li>
-      <li>No tracking.</li>
-    </ul>
-    <p>All the pros are its own cons. Choose responsibly.</p>
-    <h3>And what's with the Utopia?</h3>
-    <p>There is no anti cheat mechanisms. We assume all players are good citizens in our utopia.</p>
+    <h3>What's with the Utopia?</h3>
+    <p>
+      There's no central arbiter server. Hence no complex anti cheat mechanisms. We assume all players are good citizens
+      in our utopia.
+    </p>
     <h3>What is Bughouse Chess?</h3>
     <div class="clearfix">
       <a class="float-left" target="_blank" rel="noopener noreferrer" href="/front/bughouse_irl.jpg">
@@ -117,7 +137,7 @@
         Firebase : for discovery and signaling - <a target="_blank" href="https://firebase.google.com/" rel="nofollow">https://firebase.google.com/</a>
       </li>
       <li>
-        Assymetric encryption for public communication - <a target="_blank" href="https://github.com/dchest/tweetnacl-js">https://github.com/dchest/tweetnacl-js</a>
+        Assymetric encryption - <a target="_blank" href="https://github.com/dchest/tweetnacl-js">https://github.com/dchest/tweetnacl-js</a>
       </li>
       <li>
         Chessboard - <a target="_blank" href="https://github.com/ornicar/chessground/">https://github.com/ornicar/chessground/</a>

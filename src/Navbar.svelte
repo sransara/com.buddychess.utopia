@@ -6,7 +6,9 @@
 
 <header class="px-1 py-1 flex bg-gray-800 text-gray-200 text-3xl whitespace-no-wrap w-full overflow-hidden">
   <span class="px-1 inline-block hover:text-yellow-600">
-    <a class="inline-block" href="/" use:link>&#x2658;Buddy Chess</a>
+    <a class="flex items-center" href="/" use:link>
+      <span class="rounded-full bg-blue-200 pb-2 pr-1 pl-1 mr-2"><img class="inline" alt="icon" src="/favicon.png" /></span>
+      Buddy Chess</a>
   </span>
   {#if !$_roomId$}
     <button

@@ -2,6 +2,7 @@
   import { onMount, tick } from "svelte";
   import { replace } from "svelte-spa-router";
   import Avatar from "./components/Avatar/index.svelte";
+  import DiscordWidget from "./components/DiscordWidget.svelte";
   import { EventBusSingleton as EventBus } from "light-event-bus";
   import { roomId$, playerId$, gamen$, spots$, wizard$ } from "./common/datastore";
   import * as msgbus from "./common/msgbus";
@@ -124,11 +125,17 @@
 
 <div class="flex flex-col p-2 w-full" style="min-height: 24rem; height: calc(100vh - 5rem);">
   {#if roomChatMsgs.length <= 1}
-    <div class="bg-gray-800 p-1 rounded-t-md text-white">Global Chat</div>
+    <DiscordWidget
+      name="Buddy Chess"
+      inviteURL="https://discord.gg/Wnt7TDVzEe"
+      widgetURL="https://discord.com/api/guilds/781080058534166528/widget.json"
+    />
+    <div class="bg-gray-800 p-1 rounded-t-md mt-2 text-white">Global Chat</div>
     <iframe
+      title="IRC Global Chat"
       class="border"
-      src="https://kiwiirc.com/nextclient/?settings=0405c2ff6390168ac534179c3527c0a7"
-      style="width:100%; height:90vh;"
+      src="https://kiwiirc.com/nextclient/?settings=0405c2ff6390168ac534179c3527c0a7&nick=buglife%3F"
+      style="width:100%; height:70vh;"
       sandbox="allow-scripts allow-same-origin allow-forms"
     ></iframe>
   {:else}
