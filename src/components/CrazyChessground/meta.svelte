@@ -33,8 +33,8 @@
   <div class="absolute table bottom-0 w-1/8 pb-1/8">
     <div class="absolute h-full bottom-0 flex flex-row" style="width: 800%;">
       <div class="{global.teambg[team]} w-1/8 flex flex-col items-center justify-center">
-        <span class="inline-block text-xs">{name}</span>
-        <Avatar {avatar} />
+        <span class="inline-block text-xs">{name || 'ghosted'}</span>
+        <Avatar avatar="{avatar}" />
       </div>
       <div class="inline-block border border-gray-800 w-1/4 cursor-default">
         <Clock state="{clock.state}" minutes="{clock.minutes}" seconds="{clock.seconds}" />
@@ -42,7 +42,7 @@
       <div class="bg-gray-200 border border-gray-400 flex" style="width: 62.5%;">
         <Spares
           on:dragNewPiece="{(e) => forward('spareDragNewPiece', e)}"
-          {color}
+          color="{color}"
           dropType="{spares.dropType}"
           dropRole="{spares.dropRole}"
           pawn="{spares.pawn}"

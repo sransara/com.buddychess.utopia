@@ -29,10 +29,10 @@
     <h3 style="margin-top: 0;">Bugs and future bugs</h3>
     <p>
       We certainly got bugs in the house. Feel free to report any stragglers in our <a
-      target="_blank"
-      rel="noopener noreferrer"
-      href="https://discord.gg/Wnt7TDVzEe"
-    >
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://discord.gg/Wnt7TDVzEe"
+      >
         discord bug-reports channel</a>. We can talk about adding new bugs (features) over there as well. <a
         target="_blank"
         rel="noopener noreferrer"
@@ -128,7 +128,7 @@
       <li>
         Frontend - <a target="_blank" href="https://svelte.dev/">Svelte</a> and <a target="_blank" href="https://tailwindcss.com/">Tailwind</a>
       </li>
-      <li>Embeddings - <a target="_blank" href="https://widgetbot.io/">WidgetBot</a></li>
+      <li>Embeddings - <a target="_blank" href="https://github.com/kiwiirc/kiwiirc">Kiwi IRC</a></li>
     </ul>
   </article>
 </div>

@@ -1,5 +1,5 @@
 <script lang="typescript">
-  export let avatar: string; //"elephant" | "giraffe" | "monkey" | "rabbit"
+  export let avatar: string; //"elephant" | "giraffe" | "monkey" | "rabbit" | "ghost"
 </script>
 
 <style>
@@ -18,6 +18,10 @@
   .rabbit {
     background-image: url("./avatars/rabbit.svg");
   }
+
+  .ghost {
+    background-image: url("./avatars/ghost.svg");
+  }
 </style>
 
-<span class="h-full w-full bg-cover inline-block {avatar}"></span>
+<span class="h-full w-full bg-cover inline-block {avatar || 'ghost'}"></span>
