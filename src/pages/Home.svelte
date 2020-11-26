@@ -52,8 +52,9 @@
       </li>
     </ul>
     <ul style="margin: 0.5em;">
-      <li><i>Planned:</i> Voice chat</li>
-      <li><i>Planned:</i> Touch friendly UI</li>
+      <li><i>Planned:</i> Voice chat.</li>
+      <li><i>Planned:</i> Touch friendly UI.</li>
+      <li><i>Planned:</i> Invest in a real backend.</li>
     </ul>
     <ul style="margin: 0.5em;">
       <li>
