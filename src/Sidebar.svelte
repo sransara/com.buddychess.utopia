@@ -132,14 +132,14 @@
     />
     <div class="bg-gray-800 p-1 rounded-t-md mt-2 text-white">Global Chat</div>
     <iframe
-      title="IRC Global Chat"
+      title="Global Chat"
       class="border"
-      src="https://kiwiirc.com/nextclient/?settings=0405c2ff6390168ac534179c3527c0a7&nick=buglife%3F"
+      src="https://kiwiirc.com/nextclient/?settings=4031df0ddd4401206eb925251f69b57f"
       style="width:100%; height:70vh;"
       sandbox="allow-scripts allow-same-origin allow-forms"
     ></iframe>
   {:else}
-    <div class="bg-gray-800 p-1 rounded-t-md text-white">Chat</div>
+    <div class="bg-gray-800 p-1 rounded-t-md text-white">Game Chat</div>
     <div bind:this="{roomChatDiv}" class="flex-grow flex flex-col p-2 overflow-y-auto overflow-x-hidden border">
       <div class="flex-grow"></div>
       {#each roomChatMsgs as msg}

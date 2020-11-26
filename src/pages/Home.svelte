@@ -32,8 +32,8 @@
             Or the <a
               target="_blank"
               rel="noopener noreferrer"
-              href="https://kiwiirc.com/nextclient/irc.kiwiirc.com/#buddy-chess-utopia"
-            >global chat</a> to the right.
+              href="https://kiwiirc.com/nextclient/irc.freenode.net/?nick=buglife%3F#buddy-chess-utopia"
+            >global invites</a> to the right.
           </li>
         </ul>
       </li>
@@ -58,7 +58,7 @@
     </ul>
     <ul style="margin: 0.5em;">
       <li>
-        See straggler bugs? <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/uYq5BVqccX">Complain
+        See straggler bugs? <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/uYq5BVqccX">Report it
           in discord</a>.
       </li>
       <li>
