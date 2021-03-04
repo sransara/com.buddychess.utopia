@@ -35,7 +35,7 @@
           crystal = clocksvg.querySelector(`[data-id="${clockPart}-${di}-${ci}"]`);
         }
         if (crystals[ci] === 0) {
-          crystal.style.opacity = "0.125";
+          crystal.style.opacity = "0.025";
         } else {
           crystal.style.opacity = "1";
         }
