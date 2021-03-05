@@ -197,19 +197,21 @@
   .inactive {
     @apply opacity-50;
   }
-
   td {
     @apply align-top;
-    @apply px-2;
-    @apply py-2;
-    @apply text-4xl;
+    @apply p-1;
+    @apply text-2xl;
+  }
+
+  td.icon {
+    text-align: center;
   }
 </style>
 
 <div class="w-full flex flex-col left-0 bg-white items-center justify-center" style="min-height: calc(100vh - 5rem);">
   <table>
     <tr class:inactive="{wizard.isBefore($wizard$, wizard.steps.CREATE_OR_JOIN_ROOM_SPACE)}">
-      <td>
+      <td class="icon">
         {#if wizard.isAfter($wizard$, wizard.steps.CREATE_OR_JOIN_ROOM_SPACE)}&#x2611;{:else}&#x2610;{/if}
       </td>
       {#if wizard.isBefore($wizard$, wizard.steps.CREATE_OR_JOIN_ROOM_SPACE)}
@@ -220,7 +222,7 @@
       {:else if wizard.isIn($wizard$, wizard.steps.CREATE_OR_JOIN_ROOM_SPACE, 'todo')}
         <td in:fade>
           <button
-            class="bg-blue-500 hover:bg-blue-700 text-white px-3 rounded-lg focus:outline-none"
+            class="bg-blue-500 hover:bg-blue-700 text-white px-1 rounded-lg focus:outline-none"
             on:click="{joinRoomQueue}"
           >
             Join room queue
@@ -246,7 +248,7 @@
       {/if}
     </tr>
     <tr class:inactive="{wizard.isBefore($wizard$, wizard.steps.ROOM_SETTINGS)}">
-      <td>
+      <td class="icon">
         {#if wizard.isAfter($wizard$, wizard.steps.ROOM_SETTINGS)}&#x2611;{:else}&#x2610;{/if}
       </td>
       {#if wizard.isBefore($wizard$, wizard.steps.ROOM_SETTINGS)}
@@ -267,7 +269,7 @@
       {/if}
     </tr>
     <tr class:inactive="{wizard.isBefore($wizard$, wizard.steps.SAVE_SPOT)}">
-      <td>
+      <td class="icon">
         {#if wizard.isAfter($wizard$, wizard.steps.SAVE_SPOT)}&#x2611;{:else}&#x2610;{/if}
       </td>
       {#if wizard.isBefore($wizard$, wizard.steps.SAVE_SPOT)}
@@ -307,7 +309,7 @@
       {/if}
     </tr>
     <tr class:inactive="{wizard.isBefore($wizard$, wizard.steps.WAIT_FOR_SPOTS)}">
-      <td>
+      <td class="icon">
         {#if wizard.isAfter($wizard$, wizard.steps.WAIT_FOR_SPOTS)}&#x2611;{:else}&#x2610;{/if}
       </td>
       {#if Object.keys($spots$).length == 0}
