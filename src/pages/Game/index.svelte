@@ -1,6 +1,5 @@
 <script lang="typescript">
   import BuddyChessground from "../../components/BuddyChessground.svelte";
-  import Sidebar from "../../Sidebar.svelte";
   import Splash from "./splash.svelte";
   import { onMount, onDestroy } from "svelte";
   import { replace } from "svelte-spa-router";
@@ -11,8 +10,9 @@
     roomId$,
     _playerId$,
     playerId$,
-    spots$,
     wizard$,
+    settings$,
+    spots$,
     gamen$,
     crazy$,
     acg$,
@@ -157,7 +157,7 @@
 
   const initClockState = () => ({
     state: "stopped",
-    minutes: 3,
+    minutes: $settings$.minsPerSide,
     seconds: 0,
   });
 

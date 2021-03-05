@@ -1,4 +1,5 @@
 <script lang="typescript">
+  import SettingsForm from "./settings-form.svelte";
   import SpotForm from "./spot-form.svelte";
   import Spot from "./spot.svelte";
 
@@ -9,8 +10,8 @@
 
   import { myPublicKey, mySecretKey } from "../../common/crypto";
   import { dbrest } from "../../common/firebase";
-  import { initPeerKey, peerConnectionCleanup, setupPeerConnection, allSpotsInSync } from "./common";
-  import { _roomId$, roomId$, _playerId$, playerId$, spots$, wizard$, gamen$ } from "../../common/datastore";
+  import { peerConnectionCleanup } from "./common";
+  import { _roomId$, roomId$, _playerId$, playerId$, wizard$, settings$, spots$, gamen$ } from "../../common/datastore";
   import * as global from "../../common/dataglobal";
   import * as msgbus from "../../common/msgbus";
   import * as wizard from "../../common/wizard";
@@ -69,6 +70,18 @@
       console.log(err);
       return errors.fatal(errors.fatalEnum.UNEXPECTED);
     }
+  }
+
+  async function saveRoomSettings() {
+    $wizard$ = wizard.next($wizard$);
+
+    let response = await dbrest(`rooms/${$roomId$}/settings.json`, { method: "PUT", body: JSON.stringify($settings$) });
+    if (!response.ok) {
+      console.log(response.status);
+      return errors.fatal(errors.fatalEnum.FIRESTORE_ERROR);
+    }
+
+    $wizard$ = wizard.next($wizard$);
   }
 
   let _spotName: string = "";
@@ -185,6 +198,38 @@
         </td>
       {/if}
     </tr>
+    <tr class:inactive="{wizard.isBefore($wizard$, wizard.steps.ROOM_SETTINGS)}">
+      <td>
+        {#if wizard.isAfter($wizard$, wizard.steps.ROOM_SETTINGS)}&#x2611;{:else}&#x2610;{/if}
+      </td>
+      {#if wizard.isBefore($wizard$, wizard.steps.ROOM_SETTINGS)}
+        <td in:fade>Room settings</td>
+      {:else if wizard.isIn($wizard$, wizard.steps.ROOM_SETTINGS)}
+        <td in:fade>
+          <div class:loading="{wizard.isIn($wizard$, wizard.steps.ROOM_SETTINGS, 'doing')}">Room settings</div>
+          <SettingsForm
+            readonly="{wizard.isIn($wizard$, wizard.steps.ROOM_SETTINGS, 'doing')}"
+            bind:minsPerSide="{$settings$.minsPerSide}"
+          >
+            <div class="w-full">
+              <button
+                class="{wizard.isIn($wizard$, wizard.steps.ROOM_SETTINGS, 'doing') ? 'bg-gray-700' : 'bg-blue-500 hover:bg-blue-600'}
+                  text-white text-xl px-4 focus:outline-none rounded-lg"
+                disabled="{wizard.isIn($wizard$, wizard.steps.ROOM_SETTINGS, 'doing')}"
+                on:click="{saveRoomSettings}"
+              >
+                Save
+              </button>
+            </div>
+          </SettingsForm>
+        </td>
+      {:else if wizard.isAfter($wizard$, wizard.steps.ROOM_SETTINGS)}
+        <td in:fade>
+          <div>Room settings</div>
+          <SettingsForm readonly="{true}" bind:minsPerSide="{$settings$.minsPerSide}" />
+        </td>
+      {/if}
+    </tr>
     <tr class:inactive="{wizard.isBefore($wizard$, wizard.steps.SAVE_SPOT)}">
       <td>
         {#if wizard.isAfter($wizard$, wizard.steps.SAVE_SPOT)}&#x2611;{:else}&#x2610;{/if}
@@ -259,7 +304,9 @@
             </span>
             {#if Object.keys($spots$).length < 4}
               <div out:fade class="text-base text-gray-700 mb-1">
-                Need {4 - Object.keys($spots$).length} more player(s)
+                Need
+                {4 - Object.keys($spots$).length}
+                more player(s)
               </div>
             {/if}
             <ul class="text-base">

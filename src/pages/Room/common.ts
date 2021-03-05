@@ -73,7 +73,7 @@ export function setupPeerConnection(players: any, roomId: string, myId: string, 
     msgbus.send(players, roomId, myId, peerId, "heartbeat", {});
   }, 5000);
 
-  return new Promise((resolve) => {
+  return new Promise<void>((resolve) => {
     peerConnection.on("connect", () => {
       players[peerId]["peerConnected"] = true;
       msgbus.dataChannelListen(players, peerId, myId);

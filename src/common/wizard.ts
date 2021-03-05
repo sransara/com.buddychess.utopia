@@ -5,12 +5,13 @@ export namespace types {
 
 export const steps = {
   CREATE_OR_JOIN_ROOM_SPACE: 1,
-  SAVE_SPOT: 2,
-  WAIT_FOR_SPOTS: 3,
-  PRE_GAME: 4,
-  WAIT_FOR_GAME: 5,
-  GAME_TIME: 6,
-  END_GAME: 7,
+  ROOM_SETTINGS: 2,
+  SAVE_SPOT: 3,
+  WAIT_FOR_SPOTS: 4,
+  PRE_GAME: 5,
+  WAIT_FOR_GAME: 6,
+  GAME_TIME: 7,
+  END_GAME: 8,
 };
 
 function neww(wizard: types.wizard | {}, stepn: number | undefined, status: types.status | undefined): types.wizard {

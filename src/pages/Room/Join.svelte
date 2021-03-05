@@ -1,4 +1,5 @@
 <script lang="typescript">
+  import SettingsForm from "./settings-form.svelte";
   import SpotForm from "./spot-form.svelte";
   import Spot from "./spot.svelte";
 
@@ -9,8 +10,8 @@
 
   import { myPublicKey, mySecretKey } from "../../common/crypto";
   import { dbrest } from "../../common/firebase";
-  import { initPeerKey, setupPeerConnection, allSpotsInSync } from "./common";
-  import { _roomId$, roomId$, _playerId$, playerId$, spots$, wizard$, gamen$ } from "../../common/datastore";
+  import { initPeerKey, setupPeerConnection } from "./common";
+  import { _roomId$, roomId$, _playerId$, playerId$, wizard$, settings$, spots$, gamen$ } from "../../common/datastore";
   import * as global from "../../common/dataglobal";
   import * as msgbus from "../../common/msgbus";
   import * as wizard from "../../common/wizard";
@@ -82,10 +83,30 @@
       $playerId$ = $_playerId$;
       $roomId$ = $_roomId$;
       $wizard$ = wizard.next($wizard$);
+
+      getRoomSettings();
+      console.log($wizard$);
     } catch (err) {
       console.log(err);
       return errors.fatal(errors.fatalEnum.UNEXPECTED);
     }
+  }
+
+  if (wizard.isIn($wizard$, wizard.steps.ROOM_SETTINGS, "todo")) getRoomSettings();
+  async function getRoomSettings() {
+    console.log("HHHH");
+
+    $wizard$ = wizard.next($wizard$);
+
+    let response = await dbrest(`rooms/${$roomId$}/settings.json`);
+    if (!response.ok) {
+      console.log(response.status);
+      return errors.fatal(errors.fatalEnum.FIRESTORE_ERROR);
+    }
+    let json = await response.json();
+    $settings$ = json;
+
+    $wizard$ = wizard.next($wizard$);
   }
 
   let _spotName: string = "";
@@ -211,7 +232,8 @@
           <span class="loading">Joining room queue</span>
           <p class="text-base text-gray-700"></p>
           <p class="text-base text-gray-700">
-            Room ID: <code>{params.id}</code>
+            Room ID:
+            <code>{params.id}</code>
             <br />
             <strong>Connecting to room host</strong>
           </p>
@@ -220,6 +242,23 @@
         <td in:fade>
           Joined room queue
           <p class="text-base text-gray-700">Room ID: <code>{params.id}</code></p>
+        </td>
+      {/if}
+    </tr>
+    <tr class:inactive="{wizard.isBefore($wizard$, wizard.steps.ROOM_SETTINGS)}">
+      <td>
+        {#if wizard.isAfter($wizard$, wizard.steps.ROOM_SETTINGS)}&#x2611;{:else}&#x2610;{/if}
+      </td>
+      {#if wizard.isBefore($wizard$, wizard.steps.ROOM_SETTINGS)}
+        <td in:fade>Room settings</td>
+      {:else if wizard.isIn($wizard$, wizard.steps.ROOM_SETTINGS)}
+        <td in:fade>
+          <div class:loading="{wizard.isIn($wizard$, wizard.steps.ROOM_SETTINGS, 'doing')}">Room settings</div>
+        </td>
+      {:else if wizard.isAfter($wizard$, wizard.steps.ROOM_SETTINGS)}
+        <td in:fade>
+          <div>Room settings</div>
+          <SettingsForm readonly="{true}" bind:minsPerSide="{$settings$.minsPerSide}" />
         </td>
       {/if}
     </tr>
@@ -297,7 +336,9 @@
             </span>
             {#if Object.keys($spots$).length < 4}
               <div out:fade class="text-base text-gray-700 mb-1">
-                Need {4 - Object.keys($spots$).length} more player(s)
+                Need
+                {4 - Object.keys($spots$).length}
+                more player(s)
               </div>
             {/if}
             <ul class="text-base">
