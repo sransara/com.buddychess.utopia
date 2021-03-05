@@ -74,7 +74,7 @@
 
   async function saveRoomSettings() {
     $wizard$ = wizard.next($wizard$);
-
+    $settings$.fischerSeed = utils.getRandomInt(0, global.fischerStartingPositions.length);
     let response = await dbrest(`rooms/${$roomId$}/settings.json`, { method: "PUT", body: JSON.stringify($settings$) });
     if (!response.ok) {
       console.log(response.status);
@@ -210,6 +210,7 @@
           <SettingsForm
             readonly="{wizard.isIn($wizard$, wizard.steps.ROOM_SETTINGS, 'doing')}"
             bind:minsPerSide="{$settings$.minsPerSide}"
+            bind:startingPosition="{$settings$.startingPosition}"
           >
             <div class="w-full">
               <button
@@ -226,7 +227,11 @@
       {:else if wizard.isAfter($wizard$, wizard.steps.ROOM_SETTINGS)}
         <td in:fade>
           <div>Room settings</div>
-          <SettingsForm readonly="{true}" bind:minsPerSide="{$settings$.minsPerSide}" />
+          <SettingsForm
+            readonly="{true}"
+            minsPerSide="{$settings$.minsPerSide}"
+            startingPosition="{$settings$.startingPosition}"
+          />
         </td>
       {/if}
     </tr>

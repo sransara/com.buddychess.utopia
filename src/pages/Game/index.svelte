@@ -171,6 +171,20 @@
     queen: 0,
   });
 
+  const initCgState = () => {
+    // standard starting FEN
+    let fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    if ($settings$.startingPosition == "fischer") {
+      let index = ($settings$.fischerSeed + $gamen$) % global.fischerStartingPositions.length;
+      fen = global.fischerStartingPositions[index];
+    }
+
+    return {
+      fen: fen,
+      lastMove: [],
+    };
+  };
+
   $crazy$ = {
     [buddyId]: {
       spares: utils.getAttr($crazy$, [buddyId, "spares"], initSparesState),
@@ -218,11 +232,6 @@
     $crazy$[opId]["clock"] = initClockState();
     $crazy$[myId]["spares"] = initSparesState();
     $crazy$[myId]["clock"] = initClockState();
-
-    const initCgState = () => ({
-      fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-      lastMove: [],
-    });
 
     $acg$ = initCgState();
     $bcg$ = initCgState();

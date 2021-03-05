@@ -13,11 +13,9 @@
   <article class="prose">
     <h1 style="margin-bottom: 0.5em;">Buddy Chess Utopia</h1>
     <h2 style="margin-top: 0.5em;">
-      A friendly place for your <a
-        target="_blank"
-        href="https://en.wikipedia.org/wiki/Bughouse_chess"
-        rel="nofollow"
-      >bughouse chess</a> needs
+      A friendly place for your
+      <a target="_blank" href="https://en.wikipedia.org/wiki/Bughouse_chess" rel="nofollow">bughouse chess</a>
+      needs
     </h2>
     <h3>How to start a game?</h3>
     <ol>
@@ -26,14 +24,17 @@
         Share invitation with your buddies.
         <ul style="margin: 0;">
           <li>
-            Try in <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/uYq5BVqccX">our discord server</a>
+            Try in
+            <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/uYq5BVqccX">our discord server</a>
           </li>
           <li>
-            Or the <a
+            Or the
+            <a
               target="_blank"
               rel="noopener noreferrer"
               href="https://kiwiirc.com/nextclient/irc.freenode.net/?nick=buglife%3F#buddy-chess-utopia"
-            >global invites</a> to the right.
+            >global invites</a>
+            to the right.
           </li>
         </ul>
       </li>
@@ -42,13 +43,15 @@
     </ol>
     <h3 style="margin-top: 0;">Features</h3>
     <ul style="margin: 0.5em;">
+      <li>Fischer random starting positions.</li>
       <li>No fuss with accounts.</li>
       <li>No ads. No tracking.</li>
       <li>Pre-moving.</li>
       <li>No central server</li>
       <li>
-        Like what you see? <a target="_blank" rel="noopener noreferrer" href="https://ko-fi.com/sransara">A supportive
-          coffee will be appreciated</a>.
+        Like what you see?
+        <a target="_blank" rel="noopener noreferrer" href="https://ko-fi.com/sransara">A supportive coffee will be
+          appreciated</a>.
       </li>
     </ul>
     <ul style="margin: 0.5em;">
@@ -58,17 +61,18 @@
     </ul>
     <ul style="margin: 0.5em;">
       <li>
-        See straggler bugs? <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/uYq5BVqccX">Report it
-          in discord</a>.
+        See straggler bugs?
+        <a target="_blank" rel="noopener noreferrer" href="https://discord.gg/uYq5BVqccX">Report it in discord</a>.
       </li>
       <li>
-        Like what you see? <a
+        Like what you see?
+        <a
           target="_blank"
           rel="noopener noreferrer"
           href="https://docs.google.com/forms/d/e/1FAIpQLSeHoTQ7JBww-fqRIXnynVbX6G_DQoLNXbSHo6Q5NEboNsIzUQ/viewform?usp=sf_link"
         >Subscribe to stay upto date</a>.
       </li>
-      <li>Sauce? <a href="https://github.com/sransara/buddy-chess-utopia">Source at Github</a>.</li>
+      <li><a href="https://github.com/sransara/buddy-chess-utopia">Source at Github</a>.</li>
     </ul>
   </article>
   <p class="my-10">
@@ -120,34 +124,42 @@
       </li>
     </ol>
     <p>
-      That's pretty much it. Read more thoroughly about Bughouse on <a
-        href="https://en.wikipedia.org/wiki/Bughouse_chess"
-        rel="nofollow"
-      >Wikipedia</a> .
+      That's pretty much it. Read more thoroughly about Bughouse on
+      <a href="https://en.wikipedia.org/wiki/Bughouse_chess" rel="nofollow">Wikipedia</a>
+      .
     </p>
     <h3>How is this implemented?</h3>
     <p>
-      The source of code this implementation is out in the wild: <a href="https://github.com/sransara/buddy-chess-utopia">https://github.com/sransara/buddy-chess-utopia</a>
+      The source of code this implementation is out in the wild:
+      <a href="https://github.com/sransara/buddy-chess-utopia">https://github.com/sransara/buddy-chess-utopia</a>
     </p>
     <p>Standing on the shoulders of giants:</p>
     <ul>
       <li>
-        WebRTC : for P2P - <a target="_blank" href="https://github.com/feross/simple-peer">https://github.com/feross/simple-peer</a>
+        WebRTC : for P2P -
+        <a target="_blank" href="https://github.com/feross/simple-peer">https://github.com/feross/simple-peer</a>
       </li>
       <li>
-        Firebase : for discovery and signaling - <a target="_blank" href="https://firebase.google.com/" rel="nofollow">https://firebase.google.com/</a>
+        Firebase : for discovery and signaling -
+        <a target="_blank" href="https://firebase.google.com/" rel="nofollow">https://firebase.google.com/</a>
       </li>
       <li>
-        Assymetric encryption - <a target="_blank" href="https://github.com/dchest/tweetnacl-js">https://github.com/dchest/tweetnacl-js</a>
+        Assymetric encryption -
+        <a target="_blank" href="https://github.com/dchest/tweetnacl-js">https://github.com/dchest/tweetnacl-js</a>
       </li>
       <li>
-        Chessboard - <a target="_blank" href="https://github.com/ornicar/chessground/">https://github.com/ornicar/chessground/</a>
+        Chessboard -
+        <a target="_blank" href="https://github.com/ornicar/chessground/">https://github.com/ornicar/chessground/</a>
       </li>
       <li>
-        Original chess rules - <a target="_blank" href="https://github.com/jhlywa/chess.js/">https://github.com/jhlywa/chess.js/</a>
+        Original chess rules -
+        <a target="_blank" href="https://github.com/jhlywa/chess.js/">https://github.com/jhlywa/chess.js/</a>
       </li>
       <li>
-        Frontend - <a target="_blank" href="https://svelte.dev/">Svelte</a> and <a target="_blank" href="https://tailwindcss.com/">Tailwind</a>
+        Frontend -
+        <a target="_blank" href="https://svelte.dev/">Svelte</a>
+        and
+        <a target="_blank" href="https://tailwindcss.com/">Tailwind</a>
       </li>
       <li>Embeddings - <a target="_blank" href="https://github.com/kiwiirc/kiwiirc">Kiwi IRC</a></li>
     </ul>
