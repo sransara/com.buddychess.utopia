@@ -33,9 +33,9 @@ That's pretty much it. Read more thoroughly about Bughouse on [Wikipedia](https:
 
 ### Why Buddy Chess Utopia?
 
-- There is no logins, no accounts. You create a room, share the link and start playing.
+- There is no logins, no accounts.
+- You create a room, share the link and start playing.
 - No central servers.
-- No tracking.
 
 All the pros are its own cons. Choose responsibly.
 

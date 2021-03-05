@@ -45,7 +45,7 @@
     <ul style="margin: 0.5em;">
       <li>Fischer random starting positions.</li>
       <li>No fuss with accounts.</li>
-      <li>No ads. No tracking.</li>
+      <li>No ads.</li>
       <li>Pre-moving.</li>
       <li>No central server</li>
       <li>
