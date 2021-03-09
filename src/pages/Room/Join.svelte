@@ -94,8 +94,6 @@
 
   if (wizard.isIn($wizard$, wizard.steps.ROOM_SETTINGS, "todo")) getRoomSettings();
   async function getRoomSettings() {
-    console.log("HHHH");
-
     $wizard$ = wizard.next($wizard$);
 
     let response = await dbrest(`rooms/${$roomId$}/settings.json`);
