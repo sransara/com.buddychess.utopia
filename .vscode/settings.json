@@ -3,7 +3,6 @@
   "tailwindCSS.includeLanguages": {
     "svelte": "html"
   },
-  "editor.formatOnSave": true,
   "files.associations": {
     "*.css": "scss"
   }
