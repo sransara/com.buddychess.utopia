@@ -31,9 +31,11 @@ import * as chtypes from "chess.js";
 export const acg$ = writable({
   fen: "",
   lastMove: [] as chtypes.Square[],
+  promotions: {},
 });
 
 export const bcg$ = writable({
   fen: "",
   lastMove: [] as chtypes.Square[],
+  promotions: {} as any,
 });

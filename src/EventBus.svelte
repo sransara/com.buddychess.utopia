@@ -193,14 +193,20 @@
       if (move.fromId == $crazy$[$playerId$]["opId"]) {
         $bcg$["fen"] = move["fen"];
         $bcg$["lastMove"] = move["lastMove"];
+        $bcg$["promotions"] = move["promotions"];
         $bcg$ = $bcg$;
+        
+        console.log("recvd move promotions", $bcg$["promotions"]);
       } else {
         $acg$["fen"] = move["fen"];
         $acg$["lastMove"] = move["lastMove"];
+        $acg$["promotions"] = move["promotions"];
         $acg$ = $acg$;
       }
 
-      if (move.spare) $crazy$[$crazy$[move.fromId]["buddyId"]]["spares"][move.spare] += 1;
+      if (move.spare) {
+        $crazy$[$crazy$[move.fromId]["buddyId"]]["spares"][move.spare] += 1;
+      }
 
       $crazy$[move.fromId]["spares"]["dropType"] = undefined;
       $crazy$[move.fromId]["spares"]["dropRole"] = undefined;
@@ -227,7 +233,9 @@
         $acg$ = $acg$;
       }
 
-      if (move.spare) $crazy$[move.fromId]["spares"][move.spare] -= 1;
+      if (move.spare) { 
+        $crazy$[move.fromId]["spares"][move.spare] -= 1;
+      }
 
       $crazy$[move.fromId]["spares"]["dropType"] = "drop";
       $crazy$[move.fromId]["spares"]["dropRole"] = move.spare;

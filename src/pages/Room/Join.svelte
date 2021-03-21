@@ -85,7 +85,6 @@
       $wizard$ = wizard.next($wizard$);
 
       getRoomSettings();
-      console.log($wizard$);
     } catch (err) {
       console.log(err);
       return errors.fatal(errors.fatalEnum.UNEXPECTED);

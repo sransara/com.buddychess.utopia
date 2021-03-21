@@ -58,10 +58,10 @@ export function moves(chess: chtypes.ChessInstance): cgtypes.Dests {
   return dests as cgtypes.Dests;
 }
 
-export function move(chess: chtypes.ChessInstance, src: cgtypes.Key, dest: cgtypes.Key): cgtypes.FEN | undefined {
+export function move(chess: chtypes.ChessInstance, src: cgtypes.Key, dest: cgtypes.Key): chtypes.Move | undefined {
   const chmove = chess.move({ from: src as chtypes.Square, to: dest as chtypes.Square, promotion: "q" });
   if (!chmove) return undefined;
-  return chess.fen();
+  return chmove;
 }
 
 export function put(chess: chtypes.ChessInstance, piece: cgtypes.Piece, dest: cgtypes.Key): cgtypes.FEN | undefined {

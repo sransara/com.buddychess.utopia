@@ -182,6 +182,7 @@
     return {
       fen: fen,
       lastMove: [],
+      promotions: {},
     };
   };
 
@@ -351,19 +352,42 @@
       movable: {
         events: {
           after: (orig: cgtypes.Key, dest: cgtypes.Key, metadata: cgtypes.MoveMetadata) => {
-            const newFEN = chessx.move(bChess, orig, dest);
-            if (!newFEN) {
+            const move = chessx.move(bChess, orig, dest);
+            if (!move) {
               loadState(bChessground, bChess, $bcg$, "b", false);
               return false;
             }
 
+            const newFEN = bChess.fen();
+            const promoted = move.flags.includes("p");
             let captured = metadata.captured;
 
-            $bcg$["fen"] = newFEN;
-            $bcg$["lastMove"] = [orig as chtypes.Square, dest as chtypes.Square];
-            $bcg$ = $bcg$;
+            let newcg = {
+              "fen": newFEN,
+              "lastMove": [orig as chtypes.Square, dest as chtypes.Square],
+              "promotions": $bcg$["promotions"],
+            };
 
-            if (captured) $crazy$[buddyId]["spares"][captured.role] += 1;
+            let capturedRole: cgtypes.Role | undefined = undefined;
+            if (captured) {
+              if (newcg["promotions"][dest]) {
+                capturedRole = "pawn";
+                delete newcg["promotions"][dest];
+              } else {
+                capturedRole = captured.role;
+              }
+              $crazy$[buddyId]["spares"][capturedRole] += 1;
+            }
+
+            if (promoted) {
+              newcg["promotions"][dest] = true;
+            }
+
+            if (newcg["promotions"][orig]) {
+              delete newcg["promotions"][orig];
+              newcg["promotions"][dest] = true;
+            }
+
             $crazy$[myId]["spares"]["dropType"] = undefined;
             $crazy$[myId]["spares"]["dropRole"] = undefined;
             $crazy$[opId]["spares"]["dropType"] = undefined;
@@ -372,13 +396,15 @@
             $crazy$[myId]["clock"]["state"] = "stopped";
             $crazy$[opId]["clock"]["state"] = "active";
 
+            $bcg$ = newcg;
             $crazy$ = $crazy$;
 
             msgbus.sendAll(global.players, $roomId$, $playerId$, Object.keys($spots$), "afterMove", {
               fromId: myId,
-              fen: newFEN,
-              lastMove: [orig, dest],
-              spare: captured ? captured.role : undefined,
+              fen: newcg["fen"],
+              lastMove: newcg["lastMove"],
+              promotions: newcg["promotions"],
+              spare: capturedRole,
               clock: $crazy$[myId]["clock"],
             });
 
@@ -392,9 +418,11 @@
               return false;
             }
 
-            $bcg$["fen"] = newFEN;
-            $bcg$["lastMove"] = [dest as chtypes.Square];
-            $bcg$ = $bcg$;
+            let newcg = {
+              "fen": newFEN,
+              "lastMove": [dest as chtypes.Square],
+              "promotions": $bcg$["promotions"],
+            };
 
             $crazy$[myId]["spares"][role] -= 1;
             $crazy$[myId]["spares"]["dropType"] = "drop";
@@ -405,12 +433,13 @@
             $crazy$[myId]["clock"]["state"] = "stopped";
             $crazy$[opId]["clock"]["state"] = "active";
 
+            $bcg$ = newcg;
             $crazy$ = $crazy$;
 
             msgbus.sendAll(global.players, $roomId$, $playerId$, Object.keys($spots$), "afterNewPieceMove", {
               fromId: myId,
-              fen: newFEN,
-              lastMove: [dest],
+              fen: newcg["fen"],
+              lastMove: newcg["lastMove"],
               spare: role,
               clock: $crazy$[myId]["clock"],
             });
