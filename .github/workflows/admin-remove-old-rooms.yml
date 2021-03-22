@@ -1,0 +1,19 @@
+name: remove-old-rooms.js
+
+on:
+  schedule:
+  - cron: "0 0 * * *"
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - run: npm ci
+
+    - run: node admin/remove-old-rooms.js
+      env:
+        GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
