@@ -40,7 +40,7 @@ export function fenMoveNumber(fen: cgtypes.FEN): number {
   const turn = fenParts[1] === "w" ? 0 : 1;
   const fullmove = parseInt(fenParts[5]);
 
-  return 2 * fullmove + turn - 1;
+  return 2 * fullmove + turn;
 }
 
 export function moves(chess: chtypes.ChessInstance): cgtypes.Dests {

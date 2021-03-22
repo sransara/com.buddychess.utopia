@@ -10,6 +10,7 @@
   import * as msgbus from "./common/msgbus";
   import * as wizard from "./common/wizard";
   import * as errors from "./common/errors";
+  import { fenMoveNumber } from "./pages/Game/chessx";
 
   onMount(() => {
     // Room
@@ -191,17 +192,19 @@
 
       const move = arg.payload;
       if (move.fromId == $crazy$[$playerId$]["opId"]) {
-        $bcg$["fen"] = move["fen"];
-        $bcg$["lastMove"] = move["lastMove"];
-        $bcg$["promotions"] = move["promotions"];
-        $bcg$ = $bcg$;
-        
-        console.log("recvd move promotions", $bcg$["promotions"]);
+        if (fenMoveNumber($bcg$["fen"]) < fenMoveNumber(move["fen"])) {
+          $bcg$["fen"] = move["fen"];
+          $bcg$["lastMove"] = move["lastMove"];
+          $bcg$["promotions"] = move["promotions"];
+          $bcg$ = $bcg$;
+        }
       } else {
-        $acg$["fen"] = move["fen"];
-        $acg$["lastMove"] = move["lastMove"];
-        $acg$["promotions"] = move["promotions"];
-        $acg$ = $acg$;
+        if (fenMoveNumber($acg$["fen"]) < fenMoveNumber(move["fen"])) {
+          $acg$["fen"] = move["fen"];
+          $acg$["lastMove"] = move["lastMove"];
+          $acg$["promotions"] = move["promotions"];
+          $acg$ = $acg$;
+        }
       }
 
       if (move.spare) {
@@ -224,16 +227,20 @@
 
       const move = arg.payload;
       if (move.fromId == $crazy$[$playerId$]["opId"]) {
-        $bcg$["fen"] = move["fen"];
-        $bcg$["lastMove"] = move["lastMove"];
-        $bcg$ = $bcg$;
+        if (fenMoveNumber($bcg$["fen"]) < fenMoveNumber(move["fen"])) {
+          $bcg$["fen"] = move["fen"];
+          $bcg$["lastMove"] = move["lastMove"];
+          $bcg$ = $bcg$;
+        }
       } else {
-        $acg$["fen"] = move["fen"];
-        $acg$["lastMove"] = move["lastMove"];
-        $acg$ = $acg$;
+        if (fenMoveNumber($acg$["fen"]) < fenMoveNumber(move["fen"])) {
+          $acg$["fen"] = move["fen"];
+          $acg$["lastMove"] = move["lastMove"];
+          $acg$ = $acg$;
+        }
       }
 
-      if (move.spare) { 
+      if (move.spare) {
         $crazy$[move.fromId]["spares"][move.spare] -= 1;
       }
 
