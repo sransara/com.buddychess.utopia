@@ -1,12 +1,11 @@
-name: remove-old-rooms.js
+name: Cron twice a day
 
 on:
   schedule:
   - cron: "0 0 * * *"
 
 jobs:
-  build:
-
+  remove-old-rooms:
     runs-on: ubuntu-latest
 
     steps:
